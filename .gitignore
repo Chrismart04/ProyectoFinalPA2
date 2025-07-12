@@ -1,0 +1,19 @@
+# Java compiled output
+*.class
+
+# Build directories
+bin/
+
+# IDE files
+.classpath
+.project
+.settings/
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+
+# Logs
+*.log 
