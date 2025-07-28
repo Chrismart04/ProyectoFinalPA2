@@ -25,9 +25,13 @@ public class PrincipalView extends JFrame {
 	private JPanel contentPane;
 	public JButton btnPaciente;
 	public JButton btnCita;
+	public JButton btnProducto;
+	public JButton btnListaProducto;
 	
 	public PacientePanelView panelPaciente;
 	public CitaPanelView panelCita;
+	public ProductoPanelView panelProducto;
+	public ListaProductoPanelView panelListaProducto;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -81,7 +85,17 @@ public class PrincipalView extends JFrame {
 		panelCita = new CitaPanelView();
 		panelCita.setBounds(176, 0, 903, 589);
 		panelBack.add(panelCita);
-		panelCita.setVisible(true);
+		panelCita.setVisible(false);
+		
+		panelProducto = new ProductoPanelView();
+		panelProducto.setBounds(176, 0, 903, 589);
+		panelBack.add(panelProducto);
+		panelProducto.setVisible(false);
+		
+		panelListaProducto = new ListaProductoPanelView();
+		panelListaProducto.setBounds(176, 0, 903, 589);
+		panelBack.add(panelListaProducto);
+		panelListaProducto.setVisible(false);
 				
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -106,5 +120,23 @@ public class PrincipalView extends JFrame {
 		btnCita.setBackground(new Color(60, 63, 65));
 		btnCita.setBounds(4, 232, 169, 43);
 		panelLateral.add(btnCita);
+		
+		btnProducto = new JButton("Productos");
+		btnProducto.setBorder(null);
+		btnProducto.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnProducto.setForeground(new Color(255, 255, 255));
+		btnProducto.setBorderPainted(false);
+		btnProducto.setBackground(new Color(60, 63, 65));
+		btnProducto.setBounds(4, 276, 169, 43);
+		panelLateral.add(btnProducto);
+		
+		btnListaProducto = new JButton("Lista Productos");
+		btnListaProducto.setBorder(null);
+		btnListaProducto.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnListaProducto.setForeground(new Color(255, 255, 255));
+		btnListaProducto.setBorderPainted(false);
+		btnListaProducto.setBackground(new Color(60, 63, 65));
+		btnListaProducto.setBounds(4, 320, 169, 43);
+		panelLateral.add(btnListaProducto);
 	}
 }
