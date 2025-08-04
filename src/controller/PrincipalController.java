@@ -23,6 +23,7 @@ public class PrincipalController implements ActionListener {
         this.frame.btnPaciente.addActionListener(this);
         this.frame.btnProducto.addActionListener(this);
         this.frame.btnListaProducto.addActionListener(this);
+        this.frame.btnLogout.addActionListener(this);
 
         citaController = new CitaController(frame);
         pacienteController = new PacienteController(frame);
@@ -44,6 +45,9 @@ public class PrincipalController implements ActionListener {
         if (e.getSource() == this.frame.btnListaProducto) {
             cambiarPaneles(this.frame.panelListaProducto, listaProductoController);
         }
+        if (e.getSource() == this.frame.btnLogout) {
+            logout();
+        }
     }
 
     public void cambiarPaneles(JPanel panelActivar, AbstractPanelController panelController) {
@@ -53,5 +57,19 @@ public class PrincipalController implements ActionListener {
         this.frame.panelListaProducto.setVisible(false);
         panelActivar.setVisible(true);
         panelController.init();
+    }
+    
+    private void logout() {
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
+            frame, 
+            "¿Está seguro que desea cerrar sesión?", 
+            "Confirmar Cierre de Sesión", 
+            javax.swing.JOptionPane.YES_NO_OPTION
+        );
+        
+        if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+            frame.dispose();
+            System.exit(0);
+        }
     }
 }

@@ -1,4 +1,3 @@
-
 package view;
 
 import java.awt.EventQueue;
@@ -27,6 +26,7 @@ public class PrincipalView extends JFrame {
 	public JButton btnCita;
 	public JButton btnProducto;
 	public JButton btnListaProducto;
+	public JButton btnLogout;
 	
 	public PacientePanelView panelPaciente;
 	public CitaPanelView panelCita;
@@ -138,5 +138,14 @@ public class PrincipalView extends JFrame {
 		btnListaProducto.setBackground(new Color(60, 63, 65));
 		btnListaProducto.setBounds(4, 320, 169, 43);
 		panelLateral.add(btnListaProducto);
+		
+		btnLogout = new JButton("Cerrar Sesión");
+		btnLogout.setBorder(null);
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 14));
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setBorderPainted(false);
+		btnLogout.setBackground(new Color(200, 50, 50));
+		btnLogout.setBounds(4, 520, 169, 35);
+		panelLateral.add(btnLogout);
 	}
 }
