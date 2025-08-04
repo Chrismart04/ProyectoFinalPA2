@@ -28,7 +28,7 @@ Se ha implementado un sistema de autenticación para la aplicación de gestión 
 
 ## Credenciales por Defecto
 - **Usuario:** `admin`
-- **Contraseña:** `admin123`
+- **Contraseña:** `12345678`
 
 ## Estructura de Archivos
 
@@ -54,7 +54,7 @@ src/
 
 2. **Iniciar sesión:**
    - Ingresar usuario: `admin`
-   - Ingresar contraseña: `admin123`
+   - Ingresar contraseña: `12345678`
    - Presionar "Iniciar Sesión" o Enter
 
 3. **Cerrar sesión:**

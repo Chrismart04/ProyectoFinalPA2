@@ -15,7 +15,7 @@ public class LoginController {
 	
 	// Default credentials (in a real application, these would be stored in a database)
 	private static final String DEFAULT_USERNAME = "admin";
-	private static final String DEFAULT_PASSWORD = "admin123";
+	private static final String DEFAULT_PASSWORD = "12345678";
 	
 	public LoginController(LoginView loginView) {
 		this.loginView = loginView;
@@ -86,7 +86,7 @@ public class LoginController {
 		} else {
 			// Failed login
 			JOptionPane.showMessageDialog(loginView, 
-				"Usuario o contraseña incorrectos.\n\nUsuario: admin\nContraseña: admin123", 
+				"Usuario o contraseña incorrectos.\n\nUsuario: admin\nContraseña: 12345678", 
 				"Error de Autenticación", 
 				JOptionPane.ERROR_MESSAGE);
 			
