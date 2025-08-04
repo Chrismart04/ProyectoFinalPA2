@@ -43,6 +43,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
         this.frame.panelProducto.btnBuscar.addActionListener(this);
         this.frame.panelProducto.btnLimpiar.addActionListener(this);
         this.frame.panelProducto.btnExportarProductosPDF.addActionListener(this);
+        this.frame.panelProducto.btnSeleccionarImagen.addActionListener(this);
         
         // Agregar MouseListener a la tabla para seleccionar productos
         this.frame.panelProducto.tablaProducto.addMouseListener(new MouseAdapter() {
@@ -67,6 +68,41 @@ public class ProductoController implements ActionListener, AbstractPanelControll
             limpiarCampos();
         } else if (e.getSource() == this.frame.panelProducto.btnExportarProductosPDF) {
             exportarProductosPDF();
+        } else if (e.getSource() == this.frame.panelProducto.btnSeleccionarImagen) {
+            seleccionarImagen();
+        }
+    }
+
+    private void seleccionarImagen() {
+        String rutaImagen = this.frame.panelProducto.seleccionarImagen();
+        if (rutaImagen != null) {
+            this.frame.panelProducto.textImagen.setText(rutaImagen);
+            
+            // Si es un producto existente, actualizar inmediatamente en la base de datos
+            String idProducto = this.frame.panelProducto.textID.getText().trim();
+            if (!idProducto.isEmpty()) {
+                try {
+                    int id = Integer.parseInt(idProducto);
+                    productos.actualizarImagen(id, rutaImagen);
+                    JOptionPane.showMessageDialog(this.frame, 
+                        "Imagen seleccionada y guardada exitosamente en la base de datos", 
+                        "Éxito", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // Actualizar la tabla para reflejar los cambios
+                    actualizarTabla();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this.frame, 
+                        "Error al actualizar la imagen en la base de datos", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this.frame, 
+                    "Imagen seleccionada y copiada exitosamente", 
+                    "Éxito", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
@@ -79,11 +115,12 @@ public class ProductoController implements ActionListener, AbstractPanelControll
             String descripcion = this.frame.panelProducto.textDescripcion.getText().trim();
             double precio = Double.parseDouble(this.frame.panelProducto.textPrecio.getText().trim());
             int stock = Integer.parseInt(this.frame.panelProducto.textStock.getText().trim());
+            String imagen = this.frame.panelProducto.textImagen.getText().trim();
             
             String categoriaSeleccionada = (String) this.frame.panelProducto.comboCategoria.getSelectedItem();
             int idCategoria = Integer.parseInt(categoriaSeleccionada.split(" - ")[0]);
 
-            ProductoModel nuevoProducto = new ProductoModel(0, nombre, descripcion, precio, stock, idCategoria);
+            ProductoModel nuevoProducto = new ProductoModel(0, nombre, descripcion, precio, stock, idCategoria, imagen);
             productos.insertar(nuevoProducto);
             actualizarTabla();
             limpiarCampos();
@@ -111,6 +148,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
             productoSeleccionado.setDescripcion(this.frame.panelProducto.textDescripcion.getText().trim());
             productoSeleccionado.setPrecio(Double.parseDouble(this.frame.panelProducto.textPrecio.getText().trim()));
             productoSeleccionado.setStock(Integer.parseInt(this.frame.panelProducto.textStock.getText().trim()));
+            productoSeleccionado.setImagen(this.frame.panelProducto.textImagen.getText().trim());
             
             String categoriaSeleccionada = (String) this.frame.panelProducto.comboCategoria.getSelectedItem();
             int idCategoria = Integer.parseInt(categoriaSeleccionada.split(" - ")[0]);
@@ -175,6 +213,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
                 this.frame.panelProducto.textDescripcion.setText(productoBuscado.getDescripcion());
                 this.frame.panelProducto.textPrecio.setText(String.valueOf(productoBuscado.getPrecio()));
                 this.frame.panelProducto.textStock.setText(String.valueOf(productoBuscado.getStock()));
+                this.frame.panelProducto.establecerImagen(productoBuscado.getImagen());
                 
                 // Seleccionar la categoría correspondiente en el combo
                 for (int i = 0; i < this.frame.panelProducto.comboCategoria.getItemCount(); i++) {
@@ -257,7 +296,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
                 
                 // Encabezados de la tabla
                 Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
-                String[] headers = {"ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría"};
+                String[] headers = {"ID", "Nombre", "Descripción", "Precio (L)", "Stock", "Categoría"};
                 
                 for (String header : headers) {
                     PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
@@ -273,7 +312,14 @@ public class ProductoController implements ActionListener, AbstractPanelControll
                 for (int i = 0; i < model.getRowCount(); i++) {
                     for (int j = 0; j < model.getColumnCount(); j++) {
                         Object value = model.getValueAt(i, j);
-                        PdfPCell cell = new PdfPCell(new Phrase(value != null ? value.toString() : "", dataFont));
+                        String cellValue = value != null ? value.toString() : "";
+                        
+                        // Formatear el precio con "L" si es la columna de precio
+                        if (j == 3 && value instanceof Double) {
+                            cellValue = "L " + String.format("%.2f", (Double) value);
+                        }
+                        
+                        PdfPCell cell = new PdfPCell(new Phrase(cellValue, dataFont));
                         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                         table.addCell(cell);
                     }
@@ -379,6 +425,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
         this.frame.panelProducto.textDescripcion.setText("");
         this.frame.panelProducto.textPrecio.setText("");
         this.frame.panelProducto.textStock.setText("");
+        this.frame.panelProducto.limpiarImagen();
         this.frame.panelProducto.comboCategoria.setSelectedIndex(0);
         productoSeleccionado = null;
     }

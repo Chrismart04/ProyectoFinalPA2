@@ -18,7 +18,7 @@ public class ProductoDAO extends Conexion {
     }
 
     public void insertar(ProductoModel producto) {
-        String sentencia = "insert into productos(nombre,descripcion,precio,stock,id_categoria) values(?,?,?,?,?)";
+        String sentencia = "insert into productos(nombre,descripcion,precio,stock,id_categoria,imagen) values(?,?,?,?,?,?)";
         try {
             ps = con.prepareStatement(sentencia);
             ps.setString(1, producto.getNombre());
@@ -26,8 +26,21 @@ public class ProductoDAO extends Conexion {
             ps.setDouble(3, producto.getPrecio());
             ps.setInt(4, producto.getStock());
             ps.setInt(5, producto.getId_categoria());
+            ps.setString(6, producto.getImagen());
+            
+            // Debug: mostrar los valores que se van a insertar
+            System.out.println("Insertando producto:");
+            System.out.println("Nombre: " + producto.getNombre());
+            System.out.println("Descripción: " + producto.getDescripcion());
+            System.out.println("Precio: " + producto.getPrecio());
+            System.out.println("Stock: " + producto.getStock());
+            System.out.println("ID Categoría: " + producto.getId_categoria());
+            System.out.println("Imagen: " + producto.getImagen());
+            
             ps.execute();
+            System.out.println("Producto insertado exitosamente");
         } catch (SQLException e) {
+            System.err.println("Error al insertar: " + e.getMessage());
             JOptionPane.showMessageDialog(null, "Error al insertar: " + e.getMessage());
         }
     }
@@ -47,16 +60,22 @@ public class ProductoDAO extends Conexion {
                 producto.setStock(rs.getInt("stock"));
                 producto.setId_categoria(rs.getInt("id_categoria"));
                 producto.setNombreCategoria(rs.getString("nombre_categoria"));
+                producto.setImagen(rs.getString("imagen"));
+                
+                // Debug: mostrar los valores recuperados
+                System.out.println("Producto recuperado - ID: " + producto.getId() + ", Nombre: " + producto.getNombre() + ", Imagen: " + producto.getImagen());
+                
                 productos.add(producto);
             }
         } catch (SQLException e) {
+            System.err.println("Error al obtener: " + e.getMessage());
             JOptionPane.showMessageDialog(null, "Error al obtener: " + e.getMessage());
         }
         return productos;
     }
 
     public void modificar(ProductoModel producto) {
-        String sentencia = "update productos set nombre = ?, descripcion = ?, precio = ?, stock = ?, id_categoria = ? where id = ?";
+        String sentencia = "update productos set nombre = ?, descripcion = ?, precio = ?, stock = ?, id_categoria = ?, imagen = ? where id = ?";
         try {
             ps = con.prepareStatement(sentencia);
             ps.setString(1, producto.getNombre());
@@ -64,10 +83,37 @@ public class ProductoDAO extends Conexion {
             ps.setDouble(3, producto.getPrecio());
             ps.setInt(4, producto.getStock());
             ps.setInt(5, producto.getId_categoria());
-            ps.setInt(6, producto.getId());
+            ps.setString(6, producto.getImagen());
+            ps.setInt(7, producto.getId());
+            
+            // Debug: mostrar los valores que se van a modificar
+            System.out.println("Modificando producto ID: " + producto.getId());
+            System.out.println("Imagen: " + producto.getImagen());
+            
             ps.execute();
+            System.out.println("Producto modificado exitosamente");
         } catch (SQLException e) {
+            System.err.println("Error al modificar: " + e.getMessage());
             JOptionPane.showMessageDialog(null, "Error al modificar: " + e.getMessage());
+        }
+    }
+    
+    public void actualizarImagen(int idProducto, String rutaImagen) {
+        String sentencia = "update productos set imagen = ? where id = ?";
+        try {
+            ps = con.prepareStatement(sentencia);
+            ps.setString(1, rutaImagen);
+            ps.setInt(2, idProducto);
+            
+            // Debug: mostrar la actualización de imagen
+            System.out.println("Actualizando imagen para producto ID: " + idProducto);
+            System.out.println("Nueva ruta de imagen: " + rutaImagen);
+            
+            ps.execute();
+            System.out.println("Imagen actualizada exitosamente");
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar imagen: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al actualizar imagen: " + e.getMessage());
         }
     }
 
@@ -94,6 +140,7 @@ public class ProductoDAO extends Conexion {
                 producto.setPrecio(rs.getDouble("precio"));
                 producto.setStock(rs.getInt("stock"));
                 producto.setId_categoria(rs.getInt("id_categoria"));
+                producto.setImagen(rs.getString("imagen"));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al buscar: " + e.getMessage());

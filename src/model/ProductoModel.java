@@ -10,6 +10,7 @@ public class ProductoModel {
 	int stock;
 	int id_categoria;
 	String nombreCategoria;
+	String imagen;
 	
 	//Constructor
 	public ProductoModel(int id, String nombre, String descripcion, double precio, int stock, int id_categoria) {
@@ -21,6 +22,20 @@ public class ProductoModel {
 		this.stock = stock;
 		this.id_categoria = id_categoria;
 		this.nombreCategoria = "";
+		this.imagen = "";
+	}
+	
+	//Constructor con imagen
+	public ProductoModel(int id, String nombre, String descripcion, double precio, int stock, int id_categoria, String imagen) {
+		super();
+		this.id = id;
+		this.nombre = nombre;
+		this.descripcion = descripcion;
+		this.precio = precio;
+		this.stock = stock;
+		this.id_categoria = id_categoria;
+		this.nombreCategoria = "";
+		this.imagen = imagen;
 	}
 
 	//Métodos
@@ -79,10 +94,18 @@ public class ProductoModel {
 	public void setNombreCategoria(String nombreCategoria) {
 		this.nombreCategoria = nombreCategoria;
 	}
+	
+	public String getImagen() {
+		return imagen;
+	}
+
+	public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
 
 	@Override
 	public String toString() {
 		return "ProductoModel [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion
-				+ ", precio=" + precio + ", stock=" + stock + ", id_categoria=" + id_categoria + ", nombreCategoria=" + nombreCategoria + "]";
+				+ ", precio=" + precio + ", stock=" + stock + ", id_categoria=" + id_categoria + ", nombreCategoria=" + nombreCategoria + ", imagen=" + imagen + "]";
 	}
 } 

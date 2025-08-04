@@ -72,14 +72,14 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 .collect(java.util.stream.Collectors.toList());
         }
         
-        actualizarTabla();
+        actualizarTarjetas();
     }
 
     private void limpiarFiltros() {
         this.frame.panelListaProducto.textBuscar.setText("");
         this.frame.panelListaProducto.comboCategoriaFiltro.setSelectedIndex(0);
         productosFiltrados = null;
-        actualizarTabla();
+        actualizarTarjetas();
     }
 
     private void exportarProductosPDF() {
@@ -141,7 +141,7 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 
                 // Encabezados de la tabla
                 Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
-                String[] headers = {"ID", "Nombre", "Descripción", "Precio", "Stock", "Categoría"};
+                String[] headers = {"ID", "Nombre", "Descripción", "Precio (L)", "Stock", "Categoría"};
                 
                 for (String header : headers) {
                     PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
@@ -152,22 +152,22 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 
                 // Datos de la tabla
                 Font dataFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
-                DefaultTableModel model = (DefaultTableModel) this.frame.panelListaProducto.tablaProductos.getModel();
+                List<ProductoModel> productosAMostrar = productosFiltrados != null ? productosFiltrados : productos.obtener();
                 
-                for (int i = 0; i < model.getRowCount(); i++) {
-                    for (int j = 0; j < model.getColumnCount(); j++) {
-                        Object value = model.getValueAt(i, j);
-                        PdfPCell cell = new PdfPCell(new Phrase(value != null ? value.toString() : "", dataFont));
-                        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                        table.addCell(cell);
-                    }
+                for (ProductoModel producto : productosAMostrar) {
+                    table.addCell(new PdfPCell(new Phrase(String.valueOf(producto.getId()), dataFont)));
+                    table.addCell(new PdfPCell(new Phrase(producto.getNombre(), dataFont)));
+                    table.addCell(new PdfPCell(new Phrase(producto.getDescripcion(), dataFont)));
+                    table.addCell(new PdfPCell(new Phrase("L " + String.format("%.2f", producto.getPrecio()), dataFont)));
+                    table.addCell(new PdfPCell(new Phrase(String.valueOf(producto.getStock()), dataFont)));
+                    table.addCell(new PdfPCell(new Phrase(producto.getNombreCategoria() != null ? producto.getNombreCategoria() : "Sin categoría", dataFont)));
                 }
                 
                 document.add(table);
                 
                 // Información adicional
                 document.add(new Paragraph(" "));
-                Paragraph footer = new Paragraph("Total de productos: " + model.getRowCount(), dateFont);
+                Paragraph footer = new Paragraph("Total de productos: " + productosAMostrar.size(), dateFont);
                 footer.setAlignment(Element.ALIGN_LEFT);
                 document.add(footer);
                 
@@ -204,11 +204,38 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
             modelo.addRow(fila);
         }
     }
+    
+    private void actualizarTarjetas() {
+        // Limpiar tarjetas existentes
+        this.frame.panelListaProducto.limpiarTarjetas();
+        
+        List<ProductoModel> productosAMostrar = productosFiltrados != null ? productosFiltrados : productos.obtener();
+        
+        for (ProductoModel producto : productosAMostrar) {
+            // Crear tarjeta para cada producto
+            javax.swing.JPanel tarjeta = this.frame.panelListaProducto.crearTarjetaProducto(
+                producto.getId(),
+                producto.getNombre(),
+                producto.getDescripcion(),
+                producto.getPrecio(),
+                producto.getStock(),
+                producto.getNombreCategoria(),
+                producto.getImagen()
+            );
+            
+            // Agregar la tarjeta al panel
+            this.frame.panelListaProducto.panelCards.add(tarjeta);
+        }
+        
+        // Actualizar la vista
+        this.frame.panelListaProducto.panelCards.revalidate();
+        this.frame.panelListaProducto.panelCards.repaint();
+    }
 
     @Override
     public void init() {
         cargarCategorias();
-        actualizarTabla();
+        actualizarTarjetas();
     }
     
     private void cargarCategorias() {

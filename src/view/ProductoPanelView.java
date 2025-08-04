@@ -13,6 +13,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class ProductoPanelView extends JPanel {
 
@@ -30,6 +37,9 @@ public class ProductoPanelView extends JPanel {
 	public JButton btnExportarProductosPDF;
 	public JTextArea textDescripcion;
 	public JComboBox<String> comboCategoria;
+	public JTextField textImagen;
+	public JButton btnSeleccionarImagen;
+	public JLabel lblImagenSeleccionada;
 
 	/**
 	 * Create the panel.
@@ -49,7 +59,7 @@ public class ProductoPanelView extends JPanel {
 		panelDatosGenerales.setLayout(null);
 		panelDatosGenerales.setBorder(new TitledBorder(null, "Datos Generales", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDatosGenerales.setBackground(Color.WHITE);
-		panelDatosGenerales.setBounds(10, 20, 883, 260);
+		panelDatosGenerales.setBounds(10, 20, 883, 280);
 		panelProducto.add(panelDatosGenerales);
 		
 		JLabel lblNewLabel_1 = new JLabel("ID:");
@@ -112,15 +122,42 @@ public class ProductoPanelView extends JPanel {
 		
 		comboCategoria = new JComboBox<String>();
 		comboCategoria.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		comboCategoria.setBounds(115, 203, 425, 34);
+		comboCategoria.setBounds(115, 203, 200, 34);
 		panelDatosGenerales.add(comboCategoria);
+		
+		JLabel lblImagen = new JLabel("Imagen:");
+		lblImagen.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblImagen.setBounds(340, 205, 93, 30);
+		panelDatosGenerales.add(lblImagen);
+		
+		btnSeleccionarImagen = new JButton("Imagen");
+		btnSeleccionarImagen.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnSeleccionarImagen.setBounds(434, 203, 120, 34);
+		btnSeleccionarImagen.setIcon(new ImageIcon(ProductoPanelView.class.getResource("/icons/icons8_save_32px_1.png")));
+		btnSeleccionarImagen.setBackground(new Color(60, 63, 65));
+		btnSeleccionarImagen.setForeground(Color.WHITE);
+		btnSeleccionarImagen.setBorderPainted(false);
+		btnSeleccionarImagen.setFocusPainted(false);
+		panelDatosGenerales.add(btnSeleccionarImagen);
+		
+		// Campo oculto para almacenar la ruta de la imagen
+		textImagen = new JTextField();
+		textImagen.setVisible(false);
+		panelDatosGenerales.add(textImagen);
+		
+		// Label para mostrar la imagen seleccionada
+		lblImagenSeleccionada = new JLabel("Sin imagen seleccionada");
+		lblImagenSeleccionada.setFont(new Font("Tahoma", Font.ITALIC, 12));
+		lblImagenSeleccionada.setForeground(new Color(100, 100, 100));
+		lblImagenSeleccionada.setBounds(560, 205, 200, 30);
+		panelDatosGenerales.add(lblImagenSeleccionada);
 		
 		// Panel para los botones en el lado derecho
 		JPanel panelBotones = new JPanel();
 		panelBotones.setLayout(null);
 		panelBotones.setBorder(new TitledBorder(null, "Acciones", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelBotones.setBackground(Color.WHITE);
-		panelBotones.setBounds(560, 20, 180, 230);
+		panelBotones.setBounds(560, 20, 180, 240);
 		panelDatosGenerales.add(panelBotones);
 		
 		btnAgregar = new JButton("Agregar");
@@ -170,11 +207,11 @@ public class ProductoPanelView extends JPanel {
 		panelDetalle.setLayout(null);
 		panelDetalle.setBorder(new TitledBorder(null, "Detalle de Productos", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelDetalle.setBackground(Color.WHITE);
-		panelDetalle.setBounds(10, 290, 883, 288);
+		panelDetalle.setBounds(10, 310, 883, 268);
 		panelProducto.add(panelDetalle);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 26, 862, 251);
+		scrollPane.setBounds(10, 26, 862, 231);
 		panelDetalle.add(scrollPane);
 		
 		tablaProducto = new JTable();
@@ -186,5 +223,136 @@ public class ProductoPanelView extends JPanel {
 			}
 		));
 		scrollPane.setViewportView(tablaProducto);
+	}
+	
+	/**
+	 * Método para seleccionar una imagen del sistema de archivos
+	 * Funciona tanto para productos nuevos como para actualizar productos existentes
+	 */
+	public String seleccionarImagen() {
+		// Verificar que el nombre del producto esté ingresado
+		String nombreProducto = textNombre.getText().trim();
+		if (nombreProducto.isEmpty()) {
+			javax.swing.JOptionPane.showMessageDialog(this, 
+				"Debe ingresar el nombre del producto antes de seleccionar una imagen", 
+				"Error", 
+				javax.swing.JOptionPane.WARNING_MESSAGE);
+			textNombre.requestFocus();
+			return null;
+		}
+		
+		// Determinar si es un producto nuevo o existente
+		String idProducto = textID.getText().trim();
+		boolean esProductoExistente = !idProducto.isEmpty();
+		
+		String tituloDialogo = esProductoExistente ? 
+			"Seleccionar imagen para: " + nombreProducto :
+			"Seleccionar imagen del producto";
+		
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle(tituloDialogo);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		
+		// Filtro para archivos de imagen
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			"Archivos de imagen", "jpg", "jpeg", "png", "gif", "bmp"
+		);
+		fileChooser.setFileFilter(filter);
+		
+		int userSelection = fileChooser.showOpenDialog(this);
+		
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fileChooser.getSelectedFile();
+			
+			try {
+				// Crear directorio de productos si no existe
+				Path productosDir = Paths.get("src/img2/productos");
+				if (!Files.exists(productosDir)) {
+					Files.createDirectories(productosDir);
+				}
+				
+				// Obtener la extensión del archivo original
+				String originalFileName = selectedFile.getName();
+				String extension = "";
+				int lastDot = originalFileName.lastIndexOf('.');
+				if (lastDot > 0) {
+					extension = originalFileName.substring(lastDot).toLowerCase();
+				}
+				
+				// Crear nombre del archivo basado en el nombre del producto
+				String nombreArchivo = limpiarNombreArchivo(nombreProducto) + extension;
+				Path destinationPath = productosDir.resolve(nombreArchivo);
+				
+				// Si el archivo ya existe, agregar un número
+				int contador = 1;
+				while (Files.exists(destinationPath)) {
+					nombreArchivo = limpiarNombreArchivo(nombreProducto) + "_" + contador + extension;
+					destinationPath = productosDir.resolve(nombreArchivo);
+					contador++;
+				}
+				
+				// Copiar el archivo a la carpeta de productos
+				Files.copy(selectedFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+				
+				// Retornar la ruta relativa para la base de datos
+				String relativePath = "/img2/productos/" + nombreArchivo;
+				
+				// Actualizar el label para mostrar la imagen seleccionada
+				lblImagenSeleccionada.setText("Imagen: " + nombreArchivo);
+				lblImagenSeleccionada.setForeground(new Color(0, 150, 0));
+				
+				return relativePath;
+				
+			} catch (Exception e) {
+				javax.swing.JOptionPane.showMessageDialog(this, 
+					"Error al copiar la imagen: " + e.getMessage(), 
+					"Error", 
+					javax.swing.JOptionPane.ERROR_MESSAGE);
+				return null;
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Método para limpiar el nombre del archivo (remover caracteres especiales)
+	 */
+	private String limpiarNombreArchivo(String nombre) {
+		// Reemplazar espacios con guiones bajos
+		String limpio = nombre.replaceAll("\\s+", "_");
+		// Remover caracteres especiales excepto guiones bajos
+		limpio = limpio.replaceAll("[^a-zA-Z0-9_]", "");
+		// Convertir a minúsculas
+		limpio = limpio.toLowerCase();
+		// Limitar la longitud
+		if (limpio.length() > 50) {
+			limpio = limpio.substring(0, 50);
+		}
+		return limpio;
+	}
+	
+	/**
+	 * Método para limpiar la imagen seleccionada
+	 */
+	public void limpiarImagen() {
+		textImagen.setText("");
+		lblImagenSeleccionada.setText("Sin imagen seleccionada");
+		lblImagenSeleccionada.setForeground(new Color(100, 100, 100));
+	}
+	
+	/**
+	 * Método para establecer una imagen existente
+	 */
+	public void establecerImagen(String rutaImagen) {
+		if (rutaImagen != null && !rutaImagen.trim().isEmpty()) {
+			textImagen.setText(rutaImagen);
+			// Extraer solo el nombre del archivo para mostrar
+			String fileName = rutaImagen.substring(rutaImagen.lastIndexOf('/') + 1);
+			lblImagenSeleccionada.setText("Imagen: " + fileName);
+			lblImagenSeleccionada.setForeground(new Color(0, 150, 0));
+		} else {
+			limpiarImagen();
+		}
 	}
 } 
