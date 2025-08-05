@@ -13,7 +13,6 @@ public class LoginController {
 	private LoginView loginView;
 	private PrincipalView principalView;
 	
-	// Default credentials (in a real application, these would be stored in a database)
 	private static final String DEFAULT_USERNAME = "admin";
 	private static final String DEFAULT_PASSWORD = "12345678";
 	
@@ -73,39 +72,31 @@ public class LoginController {
 			return;
 		}
 		
-		// Check credentials
 		if (username.equals(DEFAULT_USERNAME) && password.equals(DEFAULT_PASSWORD)) {
-			// Successful login
 			JOptionPane.showMessageDialog(loginView, 
-				"¡Bienvenido al Sistema de Gestión de la Clínica Dental!", 
+				"¡Bienvenido al Sistema", 
 				"Login Exitoso", 
 				JOptionPane.INFORMATION_MESSAGE);
 			
-			// Open main application
 			openMainApplication();
 		} else {
-			// Failed login
 			JOptionPane.showMessageDialog(loginView, 
 				"Usuario o contraseña incorrectos.\n\nUsuario: admin\nContraseña: 12345678", 
 				"Error de Autenticación", 
 				JOptionPane.ERROR_MESSAGE);
 			
-			// Clear password field
 			loginView.txtPassword.setText("");
 			loginView.txtPassword.requestFocus();
 		}
 	}
 	
 	private void openMainApplication() {
-		// Hide login window
 		loginView.setVisible(false);
 		
-		// Create and show main application
 		principalView = new PrincipalView();
 		principalView.setVisible(true);
 		principalView.setLocationRelativeTo(null);
 		
-		// Initialize main controller
 		new PrincipalController(principalView);
 	}
 } 
