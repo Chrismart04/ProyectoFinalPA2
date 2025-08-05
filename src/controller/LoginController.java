@@ -22,7 +22,6 @@ public class LoginController {
 	}
 	
 	private void initListeners() {
-		// Login button action
 		loginView.btnLogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -30,7 +29,6 @@ public class LoginController {
 			}
 		});
 		
-		// Cancel button action
 		loginView.btnCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -63,7 +61,6 @@ public class LoginController {
 		String username = loginView.txtUsername.getText().trim();
 		String password = new String(loginView.txtPassword.getPassword());
 		
-		// Validate input
 		if (username.isEmpty() || password.isEmpty()) {
 			JOptionPane.showMessageDialog(loginView, 
 				"Por favor, complete todos los campos.", 
@@ -74,7 +71,7 @@ public class LoginController {
 		
 		if (username.equals(DEFAULT_USERNAME) && password.equals(DEFAULT_PASSWORD)) {
 			JOptionPane.showMessageDialog(loginView, 
-				"¡Bienvenido al Sistema", 
+				"Bienvenido al Sistema", 
 				"Login Exitoso", 
 				JOptionPane.INFORMATION_MESSAGE);
 			
