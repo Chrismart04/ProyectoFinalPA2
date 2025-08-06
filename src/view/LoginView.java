@@ -34,6 +34,7 @@ public class LoginView extends JFrame {
 					LoginView frame = new LoginView();
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null);
+					new controller.LoginController(frame);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
