@@ -28,6 +28,7 @@ public class PrincipalView extends JFrame {
 	public JButton btnCita;
 	public JButton btnProducto;
 	public JButton btnListaProducto;
+	public JButton btnFactura; // <-- Botón nuevo
 	public JButton btnLogout;
 	
 	// Login components
@@ -44,6 +45,7 @@ public class PrincipalView extends JFrame {
 	public CitaPanelView panelCita;
 	public ProductoPanelView panelProducto;
 	public ListaProductoPanelView panelListaProducto;
+	public FacturaView panelFactura; // <-- Panel nuevo
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -196,6 +198,11 @@ public class PrincipalView extends JFrame {
 		panelListaProducto.setBounds(176, 0, 903, 589);
 		panelMain.add(panelListaProducto);
 		panelListaProducto.setVisible(false);
+
+		panelFactura = new FacturaView(); // <-- Instanciar panel nuevo
+		panelFactura.setBounds(176, 0, 903, 589);
+		panelMain.add(panelFactura);
+		panelFactura.setVisible(false);
 				
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -244,6 +251,15 @@ public class PrincipalView extends JFrame {
 		btnLogout.setFont(new Font("Arial", Font.PLAIN, 14));
 		btnLogout.setForeground(new Color(255, 255, 255));
 		btnLogout.setBorderPainted(false);
+		btnFactura = new JButton("Facturación"); // <-- Crear botón nuevo
+		btnFactura.setBorder(null);
+		btnFactura.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnFactura.setForeground(new Color(255, 255, 255));
+		btnFactura.setBorderPainted(false);
+		btnFactura.setBackground(new Color(60, 63, 65));
+		btnFactura.setBounds(4, 364, 169, 43);
+		panelLateral.add(btnFactura);
+
 		btnLogout.setBackground(new Color(200, 50, 50));
 		btnLogout.setBounds(4, 520, 169, 35);
 		panelLateral.add(btnLogout);

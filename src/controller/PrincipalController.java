@@ -35,6 +35,7 @@ public class PrincipalController implements ActionListener {
         this.frame.btnPaciente.addActionListener(this);
         this.frame.btnProducto.addActionListener(this);
         this.frame.btnListaProducto.addActionListener(this);
+        this.frame.btnFactura.addActionListener(this); // <-- Listener para el botón nuevo
         this.frame.btnLogout.addActionListener(this);
         
         // Keyboard listeners for login
@@ -85,6 +86,9 @@ public class PrincipalController implements ActionListener {
         if (e.getSource() == this.frame.btnListaProducto) {
             cambiarPaneles(this.frame.panelListaProducto, listaProductoController);
         }
+        if (e.getSource() == this.frame.btnFactura) { // <-- Acción para el botón nuevo
+            mostrarPanelFactura();
+        }
         if (e.getSource() == this.frame.btnLogout) {
             logout();
         }
@@ -131,10 +135,19 @@ public class PrincipalController implements ActionListener {
         this.frame.panelPaciente.setVisible(false);
         this.frame.panelProducto.setVisible(false);
         this.frame.panelListaProducto.setVisible(false);
+        this.frame.panelFactura.setVisible(false); // <-- Ocultar panel nuevo
         panelActivar.setVisible(true);
         panelController.init();
     }
     
+    private void mostrarPanelFactura() {
+        this.frame.panelCita.setVisible(false);
+        this.frame.panelPaciente.setVisible(false);
+        this.frame.panelProducto.setVisible(false);
+        this.frame.panelListaProducto.setVisible(false);
+        this.frame.panelFactura.setVisible(true);
+    }
+
     private void logout() {
         int confirmacion = javax.swing.JOptionPane.showConfirmDialog(
             frame, 
@@ -149,6 +162,7 @@ public class PrincipalController implements ActionListener {
             this.frame.panelPaciente.setVisible(false);
             this.frame.panelProducto.setVisible(false);
             this.frame.panelListaProducto.setVisible(false);
+            this.frame.panelFactura.setVisible(false);
             
             // Show login panel
             frame.showLoginPanel();
