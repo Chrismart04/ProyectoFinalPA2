@@ -23,6 +23,7 @@ public class PrincipalView extends JFrame {
 	public JButton btnProducto;
 	public JButton btnListaProducto;
 	public JButton btnFactura; // <-- Botón nuevo
+	public JButton btnChat; // <-- Botón para Chat
 	public JButton btnLogout;
 	
 	// Main interface panel
@@ -33,6 +34,7 @@ public class PrincipalView extends JFrame {
 	public ProductoPanelView panelProducto;
 	public ListaProductoPanelView panelListaProducto;
 	public FacturaView panelFactura; // <-- Panel nuevo
+	public ChatPanelView panelChat; // <-- Panel de Chat
 	
 	/**
 	 * Create the frame.
@@ -96,6 +98,11 @@ public class PrincipalView extends JFrame {
 		panelFactura.setBounds(176, 0, 903, 589);
 		panelMain.add(panelFactura);
 		panelFactura.setVisible(false);
+
+		panelChat = new ChatPanelView(); // <-- Instanciar panel de Chat
+		panelChat.setBounds(176, 0, 903, 589);
+		panelMain.add(panelChat);
+		panelChat.setVisible(false);
 				
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -139,12 +146,7 @@ public class PrincipalView extends JFrame {
 		btnListaProducto.setBounds(4, 320, 169, 43);
 		panelLateral.add(btnListaProducto);
 		
-		btnLogout = new JButton("Cerrar Sesión");
-		btnLogout.setBorder(null);
-		btnLogout.setFont(new Font("Arial", Font.PLAIN, 14));
-		btnLogout.setForeground(new Color(255, 255, 255));
-		btnLogout.setBorderPainted(false);
-		btnFactura = new JButton("Facturación"); // <-- Crear botón nuevo
+		btnFactura = new JButton("Facturación"); // <-- Crear botón de Facturación
 		btnFactura.setBorder(null);
 		btnFactura.setFont(new Font("Arial", Font.PLAIN, 16));
 		btnFactura.setForeground(new Color(255, 255, 255));
@@ -152,6 +154,21 @@ public class PrincipalView extends JFrame {
 		btnFactura.setBackground(new Color(60, 63, 65));
 		btnFactura.setBounds(4, 364, 169, 43);
 		panelLateral.add(btnFactura);
+
+		btnChat = new JButton("Chat IA"); // <-- Crear botón de Chat
+		btnChat.setBorder(null);
+		btnChat.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnChat.setForeground(new Color(255, 255, 255));
+		btnChat.setBorderPainted(false);
+		btnChat.setBackground(new Color(60, 63, 65));
+		btnChat.setBounds(4, 408, 169, 43);
+		panelLateral.add(btnChat);
+		
+		btnLogout = new JButton("Cerrar Sesión");
+		btnLogout.setBorder(null);
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 14));
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setBorderPainted(false);
 
 		btnLogout.setBackground(new Color(200, 50, 50));
 		btnLogout.setBounds(4, 520, 169, 35);

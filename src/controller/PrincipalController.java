@@ -13,6 +13,7 @@ public class PrincipalController implements ActionListener {
     PacienteController pacienteController;
     ProductoController productoController;
     ListaProductoController listaProductoController;
+    ChatController chatController;
 
     //Constructor
     public PrincipalController(PrincipalView frame) {
@@ -25,12 +26,24 @@ public class PrincipalController implements ActionListener {
         this.frame.btnProducto.addActionListener(this);
         this.frame.btnListaProducto.addActionListener(this);
         this.frame.btnFactura.addActionListener(this); // <-- Listener para el botón nuevo
+        this.frame.btnChat.addActionListener(this); // <-- Listener para el botón de Chat
         this.frame.btnLogout.addActionListener(this);
 
         citaController = new CitaController(frame);
         pacienteController = new PacienteController(frame);
         productoController = new ProductoController(frame);
         listaProductoController = new ListaProductoController(frame);
+        chatController = new ChatController(frame);
+        
+        // Abrir automáticamente el panel de Chat IA al iniciar
+        abrirChatIA();
+    }
+    
+    /**
+     * Abre automáticamente el panel de Chat IA al iniciar la aplicación
+     */
+    private void abrirChatIA() {
+        cambiarPaneles(this.frame.panelChat, chatController);
     }
 
     //Metodos
@@ -51,6 +64,9 @@ public class PrincipalController implements ActionListener {
         if (e.getSource() == this.frame.btnFactura) { // <-- Acción para el botón nuevo
             mostrarPanelFactura();
         }
+        if (e.getSource() == this.frame.btnChat) { // <-- Acción para el botón de Chat
+            cambiarPaneles(this.frame.panelChat, chatController);
+        }
         if (e.getSource() == this.frame.btnLogout) {
             logout();
         }
@@ -62,6 +78,7 @@ public class PrincipalController implements ActionListener {
         this.frame.panelProducto.setVisible(false);
         this.frame.panelListaProducto.setVisible(false);
         this.frame.panelFactura.setVisible(false); // <-- Ocultar panel nuevo
+        this.frame.panelChat.setVisible(false); // <-- Ocultar panel de Chat
         panelActivar.setVisible(true);
         panelController.init();
     }
@@ -72,6 +89,7 @@ public class PrincipalController implements ActionListener {
         this.frame.panelProducto.setVisible(false);
         this.frame.panelListaProducto.setVisible(false);
         this.frame.panelFactura.setVisible(true);
+        this.frame.panelChat.setVisible(false); // <-- Ocultar panel de Chat
     }
 
     private void logout() {
