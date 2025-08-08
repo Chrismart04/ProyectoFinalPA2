@@ -11,16 +11,14 @@ import java.util.List;
 
 import model.ChatMessage;
 
-/**
- * Servicio para conectar con LM Studio u otros modelos locales
- * LM Studio expone una API compatible con OpenAI en http://localhost:1234/v1/chat/completions
- */
+// Servicio para conectar con LM Studio u otros modelos locales
+// API compatible con OpenAI en http://localhost:1234/v1/chat/completions
 public class LMStudioService {
     
     private static final String LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions";
     private static String MODEL_NAME = "google/gemma-3-1b"; // Modelo Gemma 3 1B
     
-    // Modelos alternativos recomendados para evitar problemas de compatibilidad
+    
     private static final String[] RECOMMENDED_MODELS = {
         "microsoft/DialoGPT-medium",
         "microsoft/DialoGPT-large", 
@@ -30,16 +28,9 @@ public class LMStudioService {
         "mistral:7b"
     };
     
-    /**
-     * Envía un mensaje al modelo de IA y obtiene la respuesta
-     * Implementa múltiples estrategias para manejar diferentes modelos
-     */
+    // Envía un mensaje al modelo de IA con estrategias para distintos modelos
     public String sendMessage(List<ChatMessage> conversationHistory, String systemContext) {
-        // Intentar con estrategias ordenadas por efectividad 
-        // system_message: usa rol "system" (funciona con GPT y algunos otros)
-        // embedded_context: embebe en primer mensaje usuario (más compatible)
-        // simple: contexto mínimo embebido
-        // alternating_strict: para modelos muy estrictos como Gemma
+     
         String[] strategies = {"system_message", "embedded_context", "simple", "alternating_strict"};
         
         System.out.println("DEBUG - Iniciando envío con contexto de " + (systemContext != null ? systemContext.length() : 0) + " caracteres");
@@ -51,12 +42,10 @@ public class LMStudioService {
                     return result;
                 }
             } catch (Exception e) {
-                // Continuar con la siguiente estrategia
                 System.out.println("Estrategia " + strategy + " falló: " + e.getMessage());
             }
         }
         
-        // Si todas las estrategias fallan, devolver mensaje de error específico
         return "❌ **Error de compatibilidad del modelo**\n\n" +
                "El modelo 'google/gemma-3-1b' tiene problemas con el formato de mensajes.\n\n" +
                "**Soluciones recomendadas:**\n" +
@@ -74,33 +63,31 @@ public class LMStudioService {
                "**Nota técnica:** Gemma requiere un patrón muy específico de alternancia user/assistant.";
     }
     
-    /**
-     * Envía mensaje usando una estrategia específica
-     */
+    // Enviar mensaje usando una estrategia específica
     private String sendMessageWithStrategy(List<ChatMessage> conversationHistory, String systemContext, String strategy) {
         try {
             URL url = new URL(LM_STUDIO_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             
-            // Configurar la conexión
+            
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
-            connection.setConnectTimeout(30000); // 30 segundos
-            connection.setReadTimeout(60000); // 60 segundos
+            connection.setConnectTimeout(30000); // 30s
+            connection.setReadTimeout(60000); // 60s
             
-            // Construir el JSON de la petición según la estrategia
+            
             String jsonRequest = buildJsonRequestWithStrategy(conversationHistory, systemContext, strategy);
-            System.out.println("Estrategia: " + strategy + " | JSON Request: " + jsonRequest); // Para debug
+            System.out.println("Estrategia: " + strategy + " | JSON Request: " + jsonRequest); 
             
-            // Enviar la petición
+            
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonRequest.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
             
-            // Leer la respuesta
+            
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 StringBuilder response = new StringBuilder();
@@ -114,7 +101,7 @@ public class LMStudioService {
                 
                 return parseResponse(response.toString());
             } else {
-                // Leer el error del servidor
+                
                 StringBuilder errorResponse = new StringBuilder();
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
@@ -123,12 +110,12 @@ public class LMStudioService {
                         errorResponse.append(responseLine.trim());
                     }
                 } catch (Exception e) {
-                    // Si no se puede leer el error
+                    
                 }
                 
                 String error = "Error del servidor (código " + responseCode + "): " + errorResponse.toString();
                 
-                // Si es el error de template, lanzar excepción para intentar otra estrategia
+                
                 if (errorResponse.toString().contains("Error rendering prompt with jinja template")) {
                     throw new RuntimeException(error);
                 }
@@ -148,9 +135,7 @@ public class LMStudioService {
         }
     }
     
-    /**
-     * Construye el JSON usando diferentes estrategias para diferentes modelos
-     */
+    // Construye JSON para diferentes estrategias
     private String buildJsonRequestWithStrategy(List<ChatMessage> conversationHistory, String systemContext, String strategy) {
         StringBuilder json = new StringBuilder();
         json.append("{");
@@ -161,27 +146,27 @@ public class LMStudioService {
         
         switch (strategy) {
             case "system_message":
-                // Estrategia 0: Usar rol "system" (mejor para modelos que lo soportan)
+                
                 hasMessages = buildSystemMessageStrategy(json, conversationHistory, systemContext);
                 break;
                 
             case "embedded_context":
-                // Estrategia 1: Contexto embebido en el primer mensaje del usuario
+                
                 hasMessages = buildEmbeddedContextStrategy(json, conversationHistory, systemContext);
                 break;
                 
             case "simple":
-                // Estrategia 2: Mensajes simples con contexto completo
+                
                 hasMessages = buildSimpleStrategy(json, conversationHistory, systemContext);
                 break;
                 
             case "alternating_strict":
-                // Estrategia 3: Alternar estrictamente user/assistant
+                
                 hasMessages = buildAlternatingStrictStrategy(json, conversationHistory, systemContext);
                 break;
                 
             default:
-                // Fallback a la estrategia system_message
+                
                 hasMessages = buildSystemMessageStrategy(json, conversationHistory, systemContext);
         }
         
@@ -194,9 +179,7 @@ public class LMStudioService {
         return json.toString();
     }
     
-    /**
-     * Estrategia 0: Usar mensaje de rol "system" (ideal para modelos que lo soportan como GPT)
-     */
+    // Estrategia 0: usar rol "system"
     private boolean buildSystemMessageStrategy(StringBuilder json, List<ChatMessage> conversationHistory, String systemContext) {
         boolean hasMessages = false;
         
@@ -207,10 +190,10 @@ public class LMStudioService {
             json.append("\"content\": \"").append(escapeJson(systemContext)).append("\"");
             json.append("}");
             hasMessages = true;
-            System.out.println("DEBUG - System message strategy enviando contexto completo (" + systemContext.length() + " caracteres)");
+            System.out.println("DEBUG - System message strategy con contexto (" + systemContext.length() + ")");
         }
         
-        // Agregar todos los mensajes de la conversación
+        // Agregar mensajes de la conversación
         for (ChatMessage message : conversationHistory) {
             if (hasMessages) json.append(",");
             
@@ -224,19 +207,17 @@ public class LMStudioService {
         return hasMessages;
     }
     
-    /**
-     * Estrategia 1: Embeber el contexto COMPLETO en el primer mensaje del usuario
-     */
+    // Estrategia 1: contexto completo en el primer mensaje del usuario
     private boolean buildEmbeddedContextStrategy(StringBuilder json, List<ChatMessage> conversationHistory, String systemContext) {
         boolean hasMessages = false;
         
         if (!conversationHistory.isEmpty()) {
             ChatMessage firstMessage = conversationHistory.get(0);
             
-            // Crear el primer mensaje con el contexto COMPLETO embebido
+            // Primer mensaje con contexto embebido
             String contextualizedContent = "";
             if (systemContext != null && !systemContext.trim().isEmpty()) {
-                // USAR TODO EL CONTEXTO, no solo una línea resumida
+                // Usar todo el contexto
                 contextualizedContent = systemContext + "\n\n=== PREGUNTA DEL USUARIO ===\n";
                 System.out.println("DEBUG - Enviando contexto completo (" + systemContext.length() + " caracteres)");
             }
@@ -248,7 +229,7 @@ public class LMStudioService {
             json.append("}");
             hasMessages = true;
             
-            // Agregar el resto del historial
+            // Resto del historial
             for (int i = 1; i < conversationHistory.size(); i++) {
                 ChatMessage message = conversationHistory.get(i);
                 if (hasMessages) json.append(",");
@@ -263,9 +244,7 @@ public class LMStudioService {
         return hasMessages;
     }
     
-    /**
-     * Estrategia 2: Mensajes simples con contexto COMPLETO en el primer mensaje
-     */
+    // Estrategia 2: mensajes simples con contexto en el primer mensaje
     private boolean buildSimpleStrategy(StringBuilder json, List<ChatMessage> conversationHistory, String systemContext) {
         boolean hasMessages = false;
         boolean isFirstUserMessage = true;
@@ -278,7 +257,7 @@ public class LMStudioService {
             
             String content = message.getContent();
             
-            // En el primer mensaje del usuario, agregar contexto COMPLETO
+            // En el primer mensaje del usuario, agregar contexto
             if (isFirstUserMessage && message.getType() == ChatMessage.MessageType.USER) {
                 if (systemContext != null && !systemContext.trim().isEmpty()) {
                     content = systemContext + "\n\n=== PREGUNTA DEL USUARIO ===\n" + content;
@@ -298,10 +277,7 @@ public class LMStudioService {
         return hasMessages;
     }
     
-    /**
-     * Estrategia 3: Asegurar alternancia estricta user/assistant
-     * Especialmente diseñada para modelos como Gemma que son muy estrictos
-     */
+    // Estrategia 3: alternancia estricta user/assistant (p.ej. Gemma)
     private boolean buildAlternatingStrictStrategy(StringBuilder json, List<ChatMessage> conversationHistory, String systemContext) {
         boolean hasMessages = false;
         String lastRole = null;
@@ -310,14 +286,14 @@ public class LMStudioService {
         for (ChatMessage message : conversationHistory) {
             String currentRole = getRoleForApi(message.getType());
             
-            // Saltar mensajes del sistema (problemas con algunos modelos)
+            // Saltar mensajes del sistema
             if ("system".equals(currentRole)) {
                 continue;
             }
             
-            // Forzar que empiece siempre con "user"
+            // Forzar que inicie con "user"
             if (isFirstMessage && !"user".equals(currentRole)) {
-                // Si el primer mensaje no es del usuario, crear uno artificial con contexto completo
+                // Crear uno artificial con contexto
                 if (hasMessages) json.append(",");
                 json.append("{");
                 json.append("\"role\": \"user\",");
@@ -334,7 +310,7 @@ public class LMStudioService {
                 lastRole = "user";
                 isFirstMessage = false;
                 
-                // Si el mensaje actual es "assistant", agregarlo
+                // Si el actual es "assistant", agregarlo
                 if ("assistant".equals(currentRole)) {
                     json.append(",");
                     json.append("{");
@@ -346,7 +322,7 @@ public class LMStudioService {
                 continue;
             }
             
-            // Saltar si es el mismo rol que el anterior (forzar alternancia)
+            // Saltar si es el mismo rol (forzar alternancia)
             if (currentRole.equals(lastRole)) {
                 continue;
             }
@@ -356,7 +332,7 @@ public class LMStudioService {
             json.append("{");
             json.append("\"role\": \"").append(currentRole).append("\",");
             
-            // En el primer mensaje del usuario, agregar contexto COMPLETO
+            // En el primer mensaje del usuario, agregar contexto
             String content = message.getContent();
             if (isFirstMessage && "user".equals(currentRole) && systemContext != null && !systemContext.trim().isEmpty()) {
                 content = systemContext + "\n\n=== PREGUNTA DEL USUARIO ===\n" + content;
@@ -372,7 +348,7 @@ public class LMStudioService {
             isFirstMessage = false;
         }
         
-        // Si terminamos con un mensaje del assistant y la lista está vacía, agregar un mensaje de usuario
+        // Si no hay mensajes, agregar uno de usuario
         if (!hasMessages) {
             json.append("{");
             json.append("\"role\": \"user\",");
@@ -384,9 +360,7 @@ public class LMStudioService {
         return hasMessages;
     }
     
-    /**
-     * Convierte el tipo de mensaje interno al formato de la API
-     */
+    // Convierte el tipo interno al formato de la API
     private String getRoleForApi(ChatMessage.MessageType type) {
         switch (type) {
             case USER:
@@ -400,9 +374,7 @@ public class LMStudioService {
         }
     }
     
-    /**
-     * Escapa caracteres especiales para JSON
-     */
+    // Escapa caracteres especiales JSON
     private String escapeJson(String text) {
         if (text == null) return "";
         
@@ -415,16 +387,14 @@ public class LMStudioService {
                   .replace("\t", "\\t");
     }
     
-    /**
-     * Extrae la respuesta del JSON devuelto por la API
-     */
+    // Extrae la respuesta del JSON de la API
     private String parseResponse(String jsonResponse) {
         try {
             System.out.println("DEBUG - JSON Response recibido: " + jsonResponse);
             
-            // Método más robusto usando expresiones regulares para extraer el contenido
+            // Extraer contenido con regex
             if (jsonResponse != null && jsonResponse.contains("\"content\"")) {
-                // Buscar el patrón "content":"..." dentro de choices
+                // Buscar patrón "content"
                 java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
                     "\"content\"\\s*:\\s*\"([^\"]*(?:\\\\.[^\"]*)*)\""
                 );
@@ -439,7 +409,7 @@ public class LMStudioService {
                 }
             }
             
-            // Fallback: método manual mejorado
+            // Fallback manual
             int choicesIndex = jsonResponse.indexOf("\"choices\"");
             if (choicesIndex != -1) {
                 String fromChoices = jsonResponse.substring(choicesIndex);
@@ -467,9 +437,7 @@ public class LMStudioService {
         }
     }
     
-    /**
-     * Limpia el contenido extraído removiendo comandos duplicados y formateando para respuestas naturales
-     */
+    // Limpia contenido para respuestas naturales
     private String cleanContent(String content) {
         if (content == null || content.trim().isEmpty()) {
             return "No pude generar una respuesta. ¿Podrías reformular tu pregunta?";
@@ -477,7 +445,7 @@ public class LMStudioService {
         
         String cleaned = content.trim();
         
-        // Remover comandos al inicio más agresivamente
+        // Remover comandos al inicio
         while (cleaned.startsWith("/") || cleaned.startsWith("`/")) {
             int firstNewline = cleaned.indexOf("\n");
             if (firstNewline > 0) {
@@ -498,14 +466,14 @@ public class LMStudioService {
                         .replaceAll("(?m)^\\*\\*[^*]*\\*\\*:\\s*$", "") // Remover títulos markdown solos
                         .trim();
         
-        // Limpiar patrones de respuesta robóticos
+        // Limpiar patrones robóticos
         cleaned = cleaned.replaceAll("(?i)\\bpara tu consulta sobre\\b", "")
                         .replaceAll("(?i)\\ben base a tu pregunta\\b", "")
                         .replaceAll("(?i)\\bcon respecto a tu pregunta\\b", "")
                         .replaceAll("(?i)\\brespecto a tu consulta\\b", "")
                         .trim();
         
-        // Mejorar formato de respuesta natural
+        // Mejorar formato natural
         cleaned = cleaned.replace("\\n", "\n")
                         .replace("\\*", "*")
                         .replace("\\\"", "\"")
@@ -515,12 +483,12 @@ public class LMStudioService {
                         .replaceAll("\n{3,}", "\n\n") // Máximo 2 saltos de línea consecutivos
                         .trim();
         
-        // Si la respuesta queda muy corta o sin sentido, proporcionar mensaje más útil
+        // Si la respuesta queda muy corta, mensaje útil
         if (cleaned.length() < 10 || cleaned.matches("^[\\s\\p{Punct}]*$")) {
             return "No pude generar una respuesta apropiada. ¿Podrías ser más específico en tu pregunta?";
         }
         
-        // Asegurar que la respuesta termine apropiadamente
+        // Asegurar cierre adecuado
         if (!cleaned.matches(".*[.!?]\\s*$")) {
             cleaned += ".";
         }
@@ -528,9 +496,7 @@ public class LMStudioService {
         return cleaned;
     }
     
-    /**
-     * Encuentra el final de una cadena JSON considerando caracteres escapados
-     */
+    // Fin de cadena JSON considerando escapes
     private int findEndOfJsonString(String json, int startIndex) {
         for (int i = startIndex; i < json.length(); i++) {
             char c = json.charAt(i);
@@ -540,7 +506,7 @@ public class LMStudioService {
                 for (int j = i - 1; j >= startIndex && json.charAt(j) == '\\'; j--) {
                     backslashes++;
                 }
-                // Si hay un número par de backslashes, la comilla no está escapada
+                // Par de backslashes: comilla no escapada
                 if (backslashes % 2 == 0) {
                     return i;
                 }
@@ -549,9 +515,7 @@ public class LMStudioService {
         return -1;
     }
     
-    /**
-     * Decodifica caracteres escapados de JSON
-     */
+    // Decodifica caracteres escapados JSON
     private String unescapeJson(String text) {
         if (text == null || text.trim().isEmpty()) {
             return "";
@@ -569,9 +533,7 @@ public class LMStudioService {
                   .replace("\\u2029", "\n"); // Separador de párrafo
     }
     
-    /**
-     * Verifica si LM Studio está disponible
-     */
+    // Verifica si LM Studio está disponible
     public boolean isLMStudioAvailable() {
         try {
             URL url = new URL(LM_STUDIO_URL.replace("/chat/completions", "/models"));
@@ -588,9 +550,7 @@ public class LMStudioService {
         }
     }
     
-    /**
-     * Obtiene la lista de modelos disponibles en LM Studio
-     */
+    // Lista de modelos disponibles en LM Studio
     public String getAvailableModels() {
         try {
             URL url = new URL(LM_STUDIO_URL.replace("/chat/completions", "/models"));
@@ -611,11 +571,11 @@ public class LMStudioService {
                     }
                 }
                 
-                // Parsear la lista de modelos
+                // Parsear modelos
                 String jsonResponse = response.toString();
                 StringBuilder models = new StringBuilder("📋 **Modelos disponibles en LM Studio:**\n\n");
                 
-                // Buscar todos los "id" en el JSON
+                // Buscar "id" en el JSON
                 int index = 0;
                 while ((index = jsonResponse.indexOf("\"id\":\"", index)) != -1) {
                     index += 6; // longitud de "id":"
@@ -643,9 +603,7 @@ public class LMStudioService {
         }
     }
     
-    /**
-     * Cambia el modelo actualmente configurado
-     */
+    // Cambia el modelo configurado
     public static String changeModel(String newModelName) {
         if (newModelName == null || newModelName.trim().isEmpty()) {
             return "❌ **Error:** Debes especificar un nombre de modelo válido.\n\n" +
@@ -663,9 +621,7 @@ public class LMStudioService {
                "Puedes verificar la conexión con el comando `/estado`.";
     }
     
-    /**
-     * Obtiene el modelo actualmente configurado
-     */
+    // Obtiene el modelo configurado
     public static String getCurrentModel() {
         return MODEL_NAME;
     }

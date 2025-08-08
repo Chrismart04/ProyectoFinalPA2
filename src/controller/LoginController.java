@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import model.UserModel;
 import view.LoginView;
 import view.PrincipalView;
 
@@ -13,7 +14,8 @@ public class LoginController {
 	private LoginView loginView;
 	private PrincipalView principalView;
 	
-	private static final String DEFAULT_USERNAME = "admin";
+	private static final String ADMIN_USERNAME = "admin";
+	private static final String USER_USERNAME = "usuario";
 	private static final String DEFAULT_PASSWORD = "12345678";
 	
 	public LoginController(LoginView loginView) {
@@ -36,7 +38,7 @@ public class LoginController {
 			}
 		});
 		
-		// Enter key on password field
+        // Enter en contraseña
 		loginView.txtPassword.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -46,7 +48,7 @@ public class LoginController {
 			}
 		});
 		
-		// Enter key on username field
+        // Enter en usuario
 		loginView.txtUsername.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -69,22 +71,43 @@ public class LoginController {
 			return;
 		}
 		
-		if (username.equals(DEFAULT_USERNAME) && password.equals(DEFAULT_PASSWORD)) {
+		UserModel authenticatedUser = authenticateUser(username, password);
+        if (authenticatedUser != null) {
+            // Configurar sesión
+            SessionController.getInstance().setCurrentUser(authenticatedUser);
+			
+			String welcomeMessage = "admin".equals(authenticatedUser.getRole()) ? 
+				"Bienvenido, Administrador" : "Bienvenido, Usuario";
+			
 			JOptionPane.showMessageDialog(loginView, 
-				"Bienvenido al Sistema", 
+				welcomeMessage, 
 				"Login Exitoso", 
 				JOptionPane.INFORMATION_MESSAGE);
 			
 			openMainApplication();
 		} else {
 			JOptionPane.showMessageDialog(loginView, 
-				"Usuario o contraseña incorrectos.\n\nUsuario: admin\nContraseña: 12345678", 
+				"Usuario o contraseña incorrectos.\n\nUsuarios válidos:\n• admin / 12345678 (Administrador)\n• usuario / 12345678 (Usuario)", 
 				"Error de Autenticación", 
 				JOptionPane.ERROR_MESSAGE);
 			
 			loginView.txtPassword.setText("");
 			loginView.txtPassword.requestFocus();
 		}
+	}
+	
+	private UserModel authenticateUser(String username, String password) {
+		if (!password.equals(DEFAULT_PASSWORD)) {
+			return null;
+		}
+		
+		if (username.equals(ADMIN_USERNAME)) {
+			return new UserModel(1, ADMIN_USERNAME, DEFAULT_PASSWORD, "Administrador", "admin", true);
+		} else if (username.equals(USER_USERNAME)) {
+			return new UserModel(2, USER_USERNAME, DEFAULT_PASSWORD, "Usuario", "user", true);
+		}
+		
+		return null;
 	}
 	
 	private void openMainApplication() {

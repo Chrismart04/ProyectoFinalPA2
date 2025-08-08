@@ -45,7 +45,10 @@ public class ProductoController implements ActionListener, AbstractPanelControll
         this.frame.panelProducto.btnExportarProductosPDF.addActionListener(this);
         this.frame.panelProducto.btnSeleccionarImagen.addActionListener(this);
         
-        // Agregar MouseListener a la tabla para seleccionar productos
+        // Configurar permisos por usuario
+        configurarPermisos();
+        
+        // Selección de producto en tabla
         this.frame.panelProducto.tablaProducto.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -78,7 +81,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
         if (rutaImagen != null) {
             this.frame.panelProducto.textImagen.setText(rutaImagen);
             
-            // Si es un producto existente, actualizar inmediatamente en la base de datos
+            // Si es producto existente, actualizar de inmediato
             String idProducto = this.frame.panelProducto.textID.getText().trim();
             if (!idProducto.isEmpty()) {
                 try {
@@ -89,7 +92,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
                         "Éxito", 
                         JOptionPane.INFORMATION_MESSAGE);
                     
-                    // Actualizar la tabla para reflejar los cambios
+                    // Actualizar tabla
                     actualizarTabla();
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this.frame, 
@@ -168,6 +171,15 @@ public class ProductoController implements ActionListener, AbstractPanelControll
 
     private void borrarProducto() {
         try {
+            // Verificar permisos antes de permitir la eliminación
+            if (!SessionController.getInstance().canDeleteProducts()) {
+                JOptionPane.showMessageDialog(this.frame, 
+                    "No tiene permisos para eliminar productos.\nContacte al administrador.", 
+                    "Acceso Denegado", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
             if (productoSeleccionado == null) {
                 JOptionPane.showMessageDialog(this.frame, "Debe seleccionar un producto de la tabla", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -208,14 +220,14 @@ public class ProductoController implements ActionListener, AbstractPanelControll
             productoBuscado = productos.buscar(productoBuscado);
             
             if (productoBuscado.getNombre() != null && !productoBuscado.getNombre().isEmpty()) {
-                // Cargar los datos del producto encontrado en los campos
+                // Cargar datos del producto encontrado
                 this.frame.panelProducto.textNombre.setText(productoBuscado.getNombre());
                 this.frame.panelProducto.textDescripcion.setText(productoBuscado.getDescripcion());
                 this.frame.panelProducto.textPrecio.setText(String.valueOf(productoBuscado.getPrecio()));
                 this.frame.panelProducto.textStock.setText(String.valueOf(productoBuscado.getStock()));
                 this.frame.panelProducto.establecerImagen(productoBuscado.getImagen());
                 
-                // Seleccionar la categoría correspondiente en el combo
+                // Seleccionar categoría en el combo
                 for (int i = 0; i < this.frame.panelProducto.comboCategoria.getItemCount(); i++) {
                     String item = this.frame.panelProducto.comboCategoria.getItemAt(i);
                     if (item.startsWith(productoBuscado.getId_categoria() + " - ")) {
@@ -354,7 +366,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
         if (filaSeleccionada >= 0) {
             DefaultTableModel modelo = (DefaultTableModel) this.frame.panelProducto.tablaProducto.getModel();
             
-            // Obtener los datos de la fila seleccionada
+            // Datos de la fila seleccionada
             int id = (Integer) modelo.getValueAt(filaSeleccionada, 0);
             String nombre = (String) modelo.getValueAt(filaSeleccionada, 1);
             String descripcion = (String) modelo.getValueAt(filaSeleccionada, 2);
@@ -362,14 +374,14 @@ public class ProductoController implements ActionListener, AbstractPanelControll
             int stock = (Integer) modelo.getValueAt(filaSeleccionada, 4);
             String categoria = (String) modelo.getValueAt(filaSeleccionada, 5);
             
-            // Cargar los datos en los campos de texto
+            // Cargar datos en los campos
             this.frame.panelProducto.textID.setText(String.valueOf(id));
             this.frame.panelProducto.textNombre.setText(nombre);
             this.frame.panelProducto.textDescripcion.setText(descripcion);
             this.frame.panelProducto.textPrecio.setText(String.valueOf(precio));
             this.frame.panelProducto.textStock.setText(String.valueOf(stock));
             
-            // Seleccionar la categoría correspondiente en el combo
+            // Seleccionar categoría en el combo
             for (int i = 0; i < this.frame.panelProducto.comboCategoria.getItemCount(); i++) {
                 String item = this.frame.panelProducto.comboCategoria.getItemAt(i);
                 if (item.endsWith(categoria)) {
@@ -378,7 +390,7 @@ public class ProductoController implements ActionListener, AbstractPanelControll
                 }
             }
             
-            // Crear el objeto del producto seleccionado
+            // Crear objeto del producto seleccionado
             productoSeleccionado = new ProductoModel(id, nombre, descripcion, precio, stock, 0);
         }
     }
@@ -434,6 +446,23 @@ public class ProductoController implements ActionListener, AbstractPanelControll
     public void init() {
         cargarCategorias();
         actualizarTabla();
+        configurarPermisos(); // Reconfigurar permisos al inicializar
+    }
+    
+    private void configurarPermisos() {
+        boolean canDelete = SessionController.getInstance().canDeleteProducts();
+        
+        // Habilitar o deshabilitar borrar según permisos
+        this.frame.panelProducto.btnBorrar.setEnabled(canDelete);
+        
+        // Cambiar la apariencia visual del botón si está deshabilitado
+        if (!canDelete) {
+            this.frame.panelProducto.btnBorrar.setToolTipText("No tiene permisos para eliminar productos");
+            this.frame.panelProducto.btnBorrar.setBackground(new java.awt.Color(150, 150, 150));
+        } else {
+            this.frame.panelProducto.btnBorrar.setToolTipText("Eliminar producto seleccionado");
+            this.frame.panelProducto.btnBorrar.setBackground(null);
+        }
     }
     
     private void cargarCategorias() {

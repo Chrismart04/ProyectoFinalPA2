@@ -52,7 +52,7 @@ public class CitaController implements ActionListener, AbstractPanelController {
         this.frame.panelCita.btnLimpiar.addActionListener(this);
         this.frame.panelCita.btnExportarCitaPDF.addActionListener(this);
         
-        // Agregar MouseListener a la tabla para seleccionar citas
+        // Selección de cita en tabla
         this.frame.panelCita.tablaCita.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -113,12 +113,12 @@ public class CitaController implements ActionListener, AbstractPanelController {
             citaBuscada = citas.buscar(citaBuscada);
             
             if (citaBuscada.getFecha() != null && !citaBuscada.getFecha().isEmpty()) {
-                // Cargar los datos de la cita encontrada en los campos
+                // Cargar datos de la cita encontrada
                 this.frame.panelCita.textFecha.setText(citaBuscada.getFecha());
                 this.frame.panelCita.textHora.setText(citaBuscada.getHora());
                 this.frame.panelCita.textProcedimiento.setText(citaBuscada.getProcedimiento());
                 
-                // Seleccionar el paciente en el combo
+                // Seleccionar paciente en el combo
                 seleccionarPacienteEnCombo(citaBuscada.getId_paciente());
                 
                 citaSeleccionada = citaBuscada;
@@ -145,7 +145,7 @@ public class CitaController implements ActionListener, AbstractPanelController {
                 return;
             }
             
-            // Actualizar los datos de la cita seleccionada
+            // Actualizar datos de la cita seleccionada
             ComboModel pacienteSeleccionado = (ComboModel) this.frame.panelCita.comboPaciente.getSelectedItem();
             citaSeleccionada.setId_paciente(pacienteSeleccionado.getId());
             citaSeleccionada.setFecha(this.frame.panelCita.textFecha.getText().trim());

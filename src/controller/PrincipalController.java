@@ -20,13 +20,13 @@ public class PrincipalController implements ActionListener {
         super();
         this.frame = frame;
         
-        // Main interface listeners
+        // Listeners de la interfaz principal
         this.frame.btnCita.addActionListener(this);
         this.frame.btnPaciente.addActionListener(this);
         this.frame.btnProducto.addActionListener(this);
         this.frame.btnListaProducto.addActionListener(this);
-        this.frame.btnFactura.addActionListener(this); // <-- Listener para el botón nuevo
-        this.frame.btnChat.addActionListener(this); // <-- Listener para el botón de Chat
+        this.frame.btnFactura.addActionListener(this);
+        this.frame.btnChat.addActionListener(this);
         this.frame.btnLogout.addActionListener(this);
 
         citaController = new CitaController(frame);
@@ -35,20 +35,18 @@ public class PrincipalController implements ActionListener {
         listaProductoController = new ListaProductoController(frame);
         chatController = new ChatController(frame);
         
-        // Abrir automáticamente el panel de Chat IA al iniciar
+        // Abrir Chat al iniciar
         abrirChatIA();
     }
     
-    /**
-     * Abre automáticamente el panel de Chat IA al iniciar la aplicación
-     */
+   
     private void abrirChatIA() {
         cambiarPaneles(this.frame.panelChat, chatController);
     }
 
     //Metodos
     public void actionPerformed(ActionEvent e) {
-        // Main interface actions
+        // Acciones de la interfaz principal
         if (e.getSource() == this.frame.btnCita) {
             cambiarPaneles(this.frame.panelCita, citaController);
         }
@@ -61,10 +59,10 @@ public class PrincipalController implements ActionListener {
         if (e.getSource() == this.frame.btnListaProducto) {
             cambiarPaneles(this.frame.panelListaProducto, listaProductoController);
         }
-        if (e.getSource() == this.frame.btnFactura) { // <-- Acción para el botón nuevo
+        if (e.getSource() == this.frame.btnFactura) {
             mostrarPanelFactura();
         }
-        if (e.getSource() == this.frame.btnChat) { // <-- Acción para el botón de Chat
+        if (e.getSource() == this.frame.btnChat) {
             cambiarPaneles(this.frame.panelChat, chatController);
         }
         if (e.getSource() == this.frame.btnLogout) {
@@ -77,8 +75,8 @@ public class PrincipalController implements ActionListener {
         this.frame.panelPaciente.setVisible(false);
         this.frame.panelProducto.setVisible(false);
         this.frame.panelListaProducto.setVisible(false);
-        this.frame.panelFactura.setVisible(false); // <-- Ocultar panel nuevo
-        this.frame.panelChat.setVisible(false); // <-- Ocultar panel de Chat
+        this.frame.panelFactura.setVisible(false);
+        this.frame.panelChat.setVisible(false);
         panelActivar.setVisible(true);
         panelController.init();
     }
@@ -89,7 +87,7 @@ public class PrincipalController implements ActionListener {
         this.frame.panelProducto.setVisible(false);
         this.frame.panelListaProducto.setVisible(false);
         this.frame.panelFactura.setVisible(true);
-        this.frame.panelChat.setVisible(false); // <-- Ocultar panel de Chat
+        this.frame.panelChat.setVisible(false);
     }
 
     private void logout() {
@@ -99,11 +97,13 @@ public class PrincipalController implements ActionListener {
             javax.swing.JOptionPane.YES_NO_OPTION);
         
         if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
-            // Close main application
+            // cerrar sesion
+            SessionController.getInstance().logout();
+            
             frame.setVisible(false);
             frame.dispose();
             
-            // Open login window
+            // Abrir ventana de login
             view.LoginView loginView = new view.LoginView();
             loginView.setVisible(true);
             new LoginController(loginView);

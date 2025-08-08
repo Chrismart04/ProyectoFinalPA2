@@ -14,8 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import com.formdev.flatlaf.intellijthemes.FlatArcIJTheme;
 
 public class LoginView extends JFrame {
@@ -42,17 +40,15 @@ public class LoginView extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	public LoginView() {
+    // Crear la ventana de login
+    public LoginView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 400, 500);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		//Theme
+        // Tema
 		FlatArcIJTheme.setup();
 		UIDefaults defaults = UIManager.getLookAndFeelDefaults();
 		defaults.putIfAbsent("Table.alternateRowColor", Color.WHITE);
@@ -73,7 +69,7 @@ public class LoginView extends JFrame {
 		lblLogo.setBounds(95, 20, 200, 150);
 		panelMain.add(lblLogo);
 		
-		// Title
+        // Título
 		JLabel lblTitle = new JLabel("Clínica Dental");
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
@@ -81,7 +77,7 @@ public class LoginView extends JFrame {
 		lblTitle.setBounds(95, 180, 200, 30);
 		panelMain.add(lblTitle);
 		
-		// Subtitle
+        // Subtítulo
 		JLabel lblSubtitle = new JLabel("Sistema de Gestión");
 		lblSubtitle.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSubtitle.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -89,34 +85,34 @@ public class LoginView extends JFrame {
 		lblSubtitle.setBounds(95, 210, 200, 20);
 		panelMain.add(lblSubtitle);
 		
-		// Username label
+        // Usuario
 		JLabel lblUsername = new JLabel("Usuario:");
 		lblUsername.setFont(new Font("Arial", Font.PLAIN, 14));
 		lblUsername.setForeground(new Color(60, 63, 65));
 		lblUsername.setBounds(95, 250, 200, 20);
 		panelMain.add(lblUsername);
 		
-		// Username field
+        // Campo usuario
 		txtUsername = new JTextField();
 		txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
 		txtUsername.setBounds(95, 275, 200, 35);
 		panelMain.add(txtUsername);
 		txtUsername.setColumns(10);
 		
-		// Password label
+        // Contraseña
 		JLabel lblPassword = new JLabel("Contraseña:");
 		lblPassword.setFont(new Font("Arial", Font.PLAIN, 14));
 		lblPassword.setForeground(new Color(60, 63, 65));
 		lblPassword.setBounds(95, 320, 200, 20);
 		panelMain.add(lblPassword);
 		
-		// Password field
+        // Campo contraseña
 		txtPassword = new JPasswordField();
 		txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
 		txtPassword.setBounds(95, 345, 200, 35);
 		panelMain.add(txtPassword);
 		
-		// Login button
+        // Botón Iniciar Sesión
 		btnLogin = new JButton("Iniciar Sesión");
 		btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
 		btnLogin.setForeground(new Color(255, 255, 255));
@@ -125,7 +121,7 @@ public class LoginView extends JFrame {
 		btnLogin.setBounds(95, 400, 200, 40);
 		panelMain.add(btnLogin);
 		
-		// Cancel button
+        // Botón Cancelar
 		btnCancel = new JButton("Cancelar");
 		btnCancel.setFont(new Font("Arial", Font.PLAIN, 12));
 		btnCancel.setForeground(new Color(100, 100, 100));

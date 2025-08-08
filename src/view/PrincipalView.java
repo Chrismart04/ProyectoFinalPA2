@@ -22,30 +22,28 @@ public class PrincipalView extends JFrame {
 	public JButton btnCita;
 	public JButton btnProducto;
 	public JButton btnListaProducto;
-	public JButton btnFactura; // <-- Botón nuevo
-	public JButton btnChat; // <-- Botón para Chat
+	public JButton btnFactura; 
+	public JButton btnChat; 
 	public JButton btnLogout;
 	
-	// Main interface panel
+    // Panel principal de la interfaz
 	public JPanel panelMain;
 	
 	public PacientePanelView panelPaciente;
 	public CitaPanelView panelCita;
 	public ProductoPanelView panelProducto;
 	public ListaProductoPanelView panelListaProducto;
-	public FacturaView panelFactura; // <-- Panel nuevo
-	public ChatPanelView panelChat; // <-- Panel de Chat
+	public FacturaView panelFactura; 
+	public ChatPanelView panelChat; 
 	
-	/**
-	 * Create the frame.
-	 */
+    // Crear la ventana principal
 	public PrincipalView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1093, 626);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		//Theme
+        // Tema de la interfaz
 		FlatArcIJTheme.setup();
 		UIDefaults defaults = UIManager.getLookAndFeelDefaults();
 		defaults.putIfAbsent("Table.alternateRowColor", Color.WHITE);
@@ -53,14 +51,12 @@ public class PrincipalView extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		// Create main interface panel
-		createMainPanel();
+        createMainPanel();
 		
-		// Show main panel directly
 		showMainPanel();
 	}
 	
-	private void createMainPanel() {
+    private void createMainPanel() {
 		panelMain = new JPanel();
 		panelMain.setBackground(new Color(245, 245, 245));
 		panelMain.setBounds(0, 0, 1079, 589);
@@ -94,12 +90,12 @@ public class PrincipalView extends JFrame {
 		panelMain.add(panelListaProducto);
 		panelListaProducto.setVisible(false);
 
-		panelFactura = new FacturaView(); // <-- Instanciar panel nuevo
+        panelFactura = new FacturaView();
 		panelFactura.setBounds(176, 0, 903, 589);
 		panelMain.add(panelFactura);
 		panelFactura.setVisible(false);
 
-		panelChat = new ChatPanelView(); // <-- Instanciar panel de Chat
+        panelChat = new ChatPanelView();
 		panelChat.setBounds(176, 0, 903, 589);
 		panelMain.add(panelChat);
 		panelChat.setVisible(false);
@@ -146,7 +142,7 @@ public class PrincipalView extends JFrame {
 		btnListaProducto.setBounds(4, 320, 169, 43);
 		panelLateral.add(btnListaProducto);
 		
-		btnFactura = new JButton("Facturación"); // <-- Crear botón de Facturación
+        btnFactura = new JButton("Facturación");
 		btnFactura.setBorder(null);
 		btnFactura.setFont(new Font("Arial", Font.PLAIN, 16));
 		btnFactura.setForeground(new Color(255, 255, 255));
@@ -155,7 +151,7 @@ public class PrincipalView extends JFrame {
 		btnFactura.setBounds(4, 364, 169, 43);
 		panelLateral.add(btnFactura);
 
-		btnChat = new JButton("Chat IA"); // <-- Crear botón de Chat
+        btnChat = new JButton("Chat IA");
 		btnChat.setBorder(null);
 		btnChat.setFont(new Font("Arial", Font.PLAIN, 16));
 		btnChat.setForeground(new Color(255, 255, 255));

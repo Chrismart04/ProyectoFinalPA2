@@ -23,7 +23,7 @@ public class ChatController implements AbstractPanelController, ActionListener {
         this.lmStudioService = new LMStudioService();
         this.chatContextDAO = new ChatContextDAO();
         
-        // Configurar listeners
+        // Listeners
         setupListeners();
         
         // Cargar contexto inicial
@@ -36,10 +36,10 @@ public class ChatController implements AbstractPanelController, ActionListener {
     }
     
     private void loadSystemContext() {
-        // Crear contexto del sistema para la IA con información completa
+        // Contexto del sistema para la IA
         StringBuilder context = new StringBuilder();
         
-        // Contexto base del asistente mejorado
+        // Contexto base
         context.append("=== ASISTENTE INTELIGENTE DE CLÍNICA DENTAL ===\n");
         context.append("Eres un asistente especializado en análisis de datos de clínica dental.\n");
         context.append("Responde de forma NATURAL, DIRECTA y CONVERSACIONAL.\n");
@@ -74,22 +74,22 @@ public class ChatController implements AbstractPanelController, ActionListener {
         context.append("P: '¿Qué productos necesitan reposición?'\n");
         context.append("R: 'Los productos que necesitan reposición urgente son: [lista con cantidades específicas]. Estos tienen stock crítico y deberían reponerse lo antes posible.'\n\n");
         
-        // Agregar contexto dinámico de la base de datos
+        // Contexto dinámico desde la BD
         try {
-            // Información de pacientes
+            // Pacientes
             context.append("=== DATOS ACTUALES DE LA CLÍNICA ===\n\n");
             context.append("📊 RESUMEN DE PACIENTES:\n");
             context.append(chatContextDAO.getPacientesContext()).append("\n");
             
-            // Información de citas
+            // Citas
             context.append("📅 RESUMEN DE CITAS:\n");
             context.append(chatContextDAO.getCitasContext()).append("\n");
             
-            // Información de productos
+            // Productos
             context.append("📦 RESUMEN DE INVENTARIO:\n");
             context.append(chatContextDAO.getProductosContext()).append("\n");
             
-            // Agregar información adicional sobre la clínica
+            // Información adicional
             context.append("=== INFORMACIÓN ADICIONAL ===\n");
             context.append("La clínica cuenta con sistema de gestión integral que incluye:\n");
             context.append("- Registro completo de pacientes con historial\n");
@@ -98,7 +98,7 @@ public class ChatController implements AbstractPanelController, ActionListener {
             context.append("- Generación de facturas\n");
             context.append("- Asistente de IA para consultas\n\n");
             
-            // Consejos comunes de salud dental
+            // Consejos de salud dental
             context.append("=== CONSEJOS DE SALUD DENTAL COMUNES ===\n");
             context.append("- Cepillarse los dientes al menos 2 veces al día\n");
             context.append("- Usar hilo dental diariamente\n");
@@ -136,7 +136,7 @@ public class ChatController implements AbstractPanelController, ActionListener {
             return;
         }
         
-        // Agregar mensaje del usuario al chat
+        // Agregar mensaje del usuario
         ChatMessage userChatMessage = new ChatMessage(userMessage, ChatMessage.MessageType.USER);
         chatView.addMessage(userChatMessage);
         chatView.clearMessageField();
@@ -144,31 +144,31 @@ public class ChatController implements AbstractPanelController, ActionListener {
         // Deshabilitar entrada mientras se procesa
         chatView.setInputEnabled(false);
         
-        // Verificar primero si hay comandos especiales o preguntas específicas
+        // Verificar comandos especiales
         String directResponse = processSpecialCommands(userMessage);
         if (directResponse != null) {
             ChatMessage directResponseMessage = new ChatMessage(directResponse, ChatMessage.MessageType.ASSISTANT);
             chatView.addMessage(directResponseMessage);
-            chatView.setInputEnabled(true); // Rehabilitar entrada
+            chatView.setInputEnabled(true); // Rehabilitar
             return;
         }
         
-        // Verificar si es una pregunta específica sobre inventario
+        // Preguntas específicas de inventario
         directResponse = processInventoryQuestions(userMessage);
         if (directResponse != null) {
             ChatMessage inventoryResponseMessage = new ChatMessage(directResponse, ChatMessage.MessageType.ASSISTANT);
             chatView.addMessage(inventoryResponseMessage);
-            chatView.setInputEnabled(true); // Rehabilitar entrada
+            chatView.setInputEnabled(true); // Rehabilitar
             return;
         }
         
-        // Procesar mensaje en background thread si no es comando especial
+        // Procesar en background si no es comando especial
         SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() throws Exception {
                 System.out.println("DEBUG - Enviando mensaje a LM Studio: " + userMessage);
                 
-                // Verificar disponibilidad de LM Studio
+                // Verificar LM Studio
                 if (!lmStudioService.isLMStudioAvailable()) {
                     System.out.println("DEBUG - LM Studio no disponible");
                     return "❌ No se puede conectar con LM Studio. Por favor:\n\n" +
@@ -180,10 +180,10 @@ public class ChatController implements AbstractPanelController, ActionListener {
                 
                 System.out.println("DEBUG - LM Studio disponible, enviando mensaje");
                 
-                // Filtrar mensajes para enviar solo la conversación real (excluir mensaje de bienvenida)
+                // Filtrar conversación (sin bienvenida)
                 List<ChatMessage> conversationMessages = filterConversationMessages(chatView.getMessages());
                 
-                // Enviar mensaje a LM Studio con contexto completo
+                // Enviar a LM Studio con contexto completo
                 System.out.println("DEBUG - Enviando " + conversationMessages.size() + " mensajes con contexto de " + systemContext.length() + " caracteres");
                 String aiResponse = lmStudioService.sendMessage(conversationMessages, systemContext);
                 System.out.println("DEBUG - Respuesta de LM Studio (" + aiResponse.length() + " caracteres): " + 
@@ -197,7 +197,7 @@ public class ChatController implements AbstractPanelController, ActionListener {
                 try {
                     String response = get();
                     
-                    // Agregar respuesta de la IA al chat
+                    // Agregar respuesta de la IA
                     ChatMessage aiResponse = new ChatMessage(response, ChatMessage.MessageType.ASSISTANT);
                     chatView.addMessage(aiResponse);
                     
@@ -207,7 +207,7 @@ public class ChatController implements AbstractPanelController, ActionListener {
                     ChatMessage errorResponse = new ChatMessage(errorMessage, ChatMessage.MessageType.ASSISTANT);
                     chatView.addMessage(errorResponse);
                 } finally {
-                    // Rehabilitar entrada
+                    // Rehabilitar
                     chatView.setInputEnabled(true);
                 }
             }

@@ -7,8 +7,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +14,7 @@ import javax.swing.JOptionPane;
 
 public class FacturaGenerator {
 
-    // A simple class to represent a product line in the invoice
+    // Línea de producto en la factura
     public static class ProductoFactura {
         private String producto;
         private Integer cantidad;
@@ -36,7 +34,7 @@ public class FacturaGenerator {
             this.total = this.subtotal.subtract(descuento).add(isv);
         }
 
-        // Getters are required by JasperReports to access the fields
+        // Getters requeridos por JasperReports
         public String getProducto() { return producto; }
         public Integer getCantidad() { return cantidad; }
         public BigDecimal getPrecio() { return precio; }
@@ -50,7 +48,7 @@ public class FacturaGenerator {
         try {
             System.out.println("Iniciando generación de factura...");
             
-            // 1. Load the report template (.jrxml)
+            // 1. Cargar plantilla (.jrxml)
             InputStream reportStream = getClass().getResourceAsStream("/reports/factura.jrxml");
             if (reportStream == null) {
                 // Intentar cargar desde la ruta alternativa
@@ -64,7 +62,7 @@ public class FacturaGenerator {
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             System.out.println("Reporte compilado exitosamente");
 
-            // 2. Calculate totals and add to parameters
+            // 2. Calcular totales y agregar a parámetros
             BigDecimal totalGeneral = productos.stream()
                 .map(ProductoFactura::getTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -86,15 +84,15 @@ public class FacturaGenerator {
             parameters.put("DESCUENTO_GENERAL", String.format("L. %,.2f", descuentoGeneral));
             parameters.put("ISV_GENERAL", String.format("L. %,.2f", isvGeneral));
             
-            // 3. Create a JRBeanCollectionDataSource
+            // 3. Crear JRBeanCollectionDataSource
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(productos);
             System.out.println("DataSource creado con " + productos.size() + " productos");
 
-            // 4. Fill the report
+            // 4. Rellenar reporte
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
             System.out.println("Reporte rellenado exitosamente");
 
-            // 5. Create output directory and export to PDF
+            // 5. Crear directorio y exportar a PDF
             File reportesDir = new File("reportes");
             if (!reportesDir.exists()) {
                 boolean created = reportesDir.mkdirs();
@@ -107,7 +105,7 @@ public class FacturaGenerator {
             JasperExportManager.exportReportToPdfFile(jasperPrint, outputFile);
             System.out.println("PDF exportado exitosamente en: " + outputFile);
 
-            // 6. Try to open the generated PDF
+            // 6. Abrir el PDF generado (si es posible)
             File pdfFile = new File(outputFile);
             if (pdfFile.exists()) {
                 if (Desktop.isDesktopSupported()) {

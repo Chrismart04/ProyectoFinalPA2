@@ -56,7 +56,7 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
         String nombreBuscar = this.frame.panelListaProducto.textBuscar.getText().trim();
         String categoriaFiltro = (String) this.frame.panelListaProducto.comboCategoriaFiltro.getSelectedItem();
         
-        // Filtrar productos
+        // Filtrado de productos
         productosFiltrados = productos.obtener();
         
         if (!nombreBuscar.isEmpty()) {
@@ -103,12 +103,12 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 java.io.File fileToSave = fileChooser.getSelectedFile();
                 String filePath = fileToSave.getAbsolutePath();
                 
-                // Asegurar que el archivo tenga extensión .pdf
+                // Asegurar extensión .pdf
                 if (!filePath.toLowerCase().endsWith(".pdf")) {
                     filePath += ".pdf";
                 }
                 
-                // Crear el documento PDF
+                // Crear documento PDF
                 Document document = new Document(PageSize.A4);
                 PdfWriter.getInstance(document, new FileOutputStream(filePath));
                 
@@ -129,13 +129,13 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 // Espacio
                 document.add(new Paragraph(" "));
                 
-                // Crear tabla con 6 columnas
+                // Tabla con 6 columnas
                 PdfPTable table = new PdfPTable(6);
                 table.setWidthPercentage(100);
                 table.setSpacingBefore(10f);
                 table.setSpacingAfter(10f);
                 
-                // Definir anchos de columnas
+                // Anchos de columnas
                 float[] columnWidths = {8f, 20f, 25f, 12f, 10f, 25f};
                 table.setWidths(columnWidths);
                 
@@ -206,13 +206,13 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
     }
     
     private void actualizarTarjetas() {
-        // Limpiar tarjetas existentes
+        // Limpiar tarjetas
         this.frame.panelListaProducto.limpiarTarjetas();
         
         List<ProductoModel> productosAMostrar = productosFiltrados != null ? productosFiltrados : productos.obtener();
         
         for (ProductoModel producto : productosAMostrar) {
-            // Crear tarjeta para cada producto
+            // Crear tarjeta por producto
             javax.swing.JPanel tarjeta = this.frame.panelListaProducto.crearTarjetaProducto(
                 producto.getId(),
                 producto.getNombre(),
@@ -223,11 +223,11 @@ public class ListaProductoController implements ActionListener, AbstractPanelCon
                 producto.getImagen()
             );
             
-            // Agregar la tarjeta al panel
+            // Agregar tarjeta al panel
             this.frame.panelListaProducto.panelCards.add(tarjeta);
         }
         
-        // Actualizar la vista
+        // Actualizar vista
         this.frame.panelListaProducto.panelCards.revalidate();
         this.frame.panelListaProducto.panelCards.repaint();
     }
