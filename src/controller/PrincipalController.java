@@ -3,6 +3,9 @@ package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import javax.swing.JPanel;
 import view.PrincipalView;
 
@@ -27,6 +30,7 @@ public class PrincipalController implements ActionListener {
         this.frame.btnListaProducto.addActionListener(this);
         this.frame.btnFactura.addActionListener(this);
         this.frame.btnChat.addActionListener(this);
+        this.frame.btnManual.addActionListener(this);
         this.frame.btnLogout.addActionListener(this);
 
         citaController = new CitaController(frame);
@@ -64,6 +68,9 @@ public class PrincipalController implements ActionListener {
         }
         if (e.getSource() == this.frame.btnChat) {
             cambiarPaneles(this.frame.panelChat, chatController);
+        }
+        if (e.getSource() == this.frame.btnManual) {
+            abrirManualUsuario();
         }
         if (e.getSource() == this.frame.btnLogout) {
             logout();
@@ -107,6 +114,23 @@ public class PrincipalController implements ActionListener {
             view.LoginView loginView = new view.LoginView();
             loginView.setVisible(true);
             new LoginController(loginView);
+        }
+    }
+
+    private void abrirManualUsuario() {
+        File pdf = new File(System.getProperty("user.dir"), "manual_de_usuario.pdf");
+        if (!pdf.exists()) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "No se encontró manual_de_usuario.pdf", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Desktop.isDesktopSupported()) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "La apertura de archivos no es soportada en este sistema", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            Desktop.getDesktop().open(pdf);
+        } catch (IOException ex) {
+            javax.swing.JOptionPane.showMessageDialog(frame, "No se pudo abrir el manual", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }
 }

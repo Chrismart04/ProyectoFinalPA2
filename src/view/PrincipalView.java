@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +25,7 @@ public class PrincipalView extends JFrame {
 	public JButton btnListaProducto;
 	public JButton btnFactura; 
 	public JButton btnChat; 
+    public JButton btnManual;
 	public JButton btnLogout;
 	
     // Panel principal de la interfaz
@@ -55,6 +57,21 @@ public class PrincipalView extends JFrame {
 		
 		showMainPanel();
 	}
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    LoginView frame = new LoginView();
+                    frame.setVisible(true);
+                    frame.setLocationRelativeTo(null);
+                    new controller.LoginController(frame);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 	
     private void createMainPanel() {
 		panelMain = new JPanel();
@@ -159,6 +176,15 @@ public class PrincipalView extends JFrame {
 		btnChat.setBackground(new Color(60, 63, 65));
 		btnChat.setBounds(4, 408, 169, 43);
 		panelLateral.add(btnChat);
+
+        btnManual = new JButton("Manual");
+        btnManual.setBorder(null);
+        btnManual.setFont(new Font("Arial", Font.PLAIN, 16));
+        btnManual.setForeground(new Color(255, 255, 255));
+        btnManual.setBorderPainted(false);
+        btnManual.setBackground(new Color(60, 63, 65));
+        btnManual.setBounds(4, 452, 169, 43);
+        panelLateral.add(btnManual);
 		
 		btnLogout = new JButton("Cerrar Sesión");
 		btnLogout.setBorder(null);

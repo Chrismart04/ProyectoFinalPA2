@@ -1,6 +1,4 @@
 package view;
-
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,21 +22,7 @@ public class LoginView extends JFrame {
 	public JPasswordField txtPassword;
 	public JButton btnLogin;
 	public JButton btnCancel;
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					LoginView frame = new LoginView();
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					new controller.LoginController(frame);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+    
 
     // Crear la ventana de login
     public LoginView() {
