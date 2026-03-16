@@ -1,13 +1,9 @@
-
 package view;
 
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import controller.PrincipalController;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -27,37 +23,29 @@ public class PrincipalView extends JFrame {
 	public JButton btnCita;
 	public JButton btnProducto;
 	public JButton btnListaProducto;
+	public JButton btnFactura; 
+	public JButton btnChat; 
+    public JButton btnManual;
+	public JButton btnLogout;
+	
+    // Panel principal de la interfaz
+	public JPanel panelMain;
 	
 	public PacientePanelView panelPaciente;
 	public CitaPanelView panelCita;
 	public ProductoPanelView panelProducto;
 	public ListaProductoPanelView panelListaProducto;
+	public FacturaView panelFactura; 
+	public ChatPanelView panelChat; 
 	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					PrincipalView frame = new PrincipalView();
-					frame.setVisible(true);
-					frame.setLocationRelativeTo(null);
-					new PrincipalController(frame);				
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
+    // Crear la ventana principal
 	public PrincipalView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1093, 626);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		//Theme
+        // Tema de la interfaz
 		FlatArcIJTheme.setup();
 		UIDefaults defaults = UIManager.getLookAndFeelDefaults();
 		defaults.putIfAbsent("Table.alternateRowColor", Color.WHITE);
@@ -65,37 +53,69 @@ public class PrincipalView extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JPanel panelBack = new JPanel();
-		panelBack.setBackground(new Color(245, 245, 245));
-		panelBack.setBounds(0, 0, 1079, 589);
-		contentPane.add(panelBack);
-		panelBack.setLayout(null);
+        createMainPanel();
+		
+		showMainPanel();
+	}
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    LoginView frame = new LoginView();
+                    frame.setVisible(true);
+                    frame.setLocationRelativeTo(null);
+                    new controller.LoginController(frame);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+	
+    private void createMainPanel() {
+		panelMain = new JPanel();
+		panelMain.setBackground(new Color(245, 245, 245));
+		panelMain.setBounds(0, 0, 1079, 589);
+		contentPane.add(panelMain);
+		panelMain.setLayout(null);
+		panelMain.setVisible(false);
 		
 		JPanel panelLateral = new JPanel();
 		panelLateral.setBackground(new Color(60, 63, 65));
 		panelLateral.setBounds(0, 0, 179, 606);
-		panelBack.add(panelLateral);
+		panelMain.add(panelLateral);
 		panelLateral.setLayout(null);
 		
 		panelPaciente = new PacientePanelView();		
 		panelPaciente.setBounds(176, 0, 903, 589);
-		panelBack.add(panelPaciente);
+		panelMain.add(panelPaciente);
 		panelPaciente.setVisible(false);
 		
 		panelCita = new CitaPanelView();
 		panelCita.setBounds(176, 0, 903, 589);
-		panelBack.add(panelCita);
+		panelMain.add(panelCita);
 		panelCita.setVisible(false);
 		
 		panelProducto = new ProductoPanelView();
 		panelProducto.setBounds(176, 0, 903, 589);
-		panelBack.add(panelProducto);
+		panelMain.add(panelProducto);
 		panelProducto.setVisible(false);
 		
 		panelListaProducto = new ListaProductoPanelView();
 		panelListaProducto.setBounds(176, 0, 903, 589);
-		panelBack.add(panelListaProducto);
+		panelMain.add(panelListaProducto);
 		panelListaProducto.setVisible(false);
+
+        panelFactura = new FacturaView();
+		panelFactura.setBounds(176, 0, 903, 589);
+		panelMain.add(panelFactura);
+		panelFactura.setVisible(false);
+
+        panelChat = new ChatPanelView();
+		panelChat.setBounds(176, 0, 903, 589);
+		panelMain.add(panelChat);
+		panelChat.setVisible(false);
 				
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -138,5 +158,46 @@ public class PrincipalView extends JFrame {
 		btnListaProducto.setBackground(new Color(60, 63, 65));
 		btnListaProducto.setBounds(4, 320, 169, 43);
 		panelLateral.add(btnListaProducto);
+		
+        btnFactura = new JButton("Facturación");
+		btnFactura.setBorder(null);
+		btnFactura.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnFactura.setForeground(new Color(255, 255, 255));
+		btnFactura.setBorderPainted(false);
+		btnFactura.setBackground(new Color(60, 63, 65));
+		btnFactura.setBounds(4, 364, 169, 43);
+		panelLateral.add(btnFactura);
+
+        btnChat = new JButton("Chat IA");
+		btnChat.setBorder(null);
+		btnChat.setFont(new Font("Arial", Font.PLAIN, 16));
+		btnChat.setForeground(new Color(255, 255, 255));
+		btnChat.setBorderPainted(false);
+		btnChat.setBackground(new Color(60, 63, 65));
+		btnChat.setBounds(4, 408, 169, 43);
+		panelLateral.add(btnChat);
+
+        btnManual = new JButton("Manual");
+        btnManual.setBorder(null);
+        btnManual.setFont(new Font("Arial", Font.PLAIN, 16));
+        btnManual.setForeground(new Color(255, 255, 255));
+        btnManual.setBorderPainted(false);
+        btnManual.setBackground(new Color(60, 63, 65));
+        btnManual.setBounds(4, 452, 169, 43);
+        panelLateral.add(btnManual);
+		
+		btnLogout = new JButton("Cerrar Sesión");
+		btnLogout.setBorder(null);
+		btnLogout.setFont(new Font("Arial", Font.PLAIN, 14));
+		btnLogout.setForeground(new Color(255, 255, 255));
+		btnLogout.setBorderPainted(false);
+
+		btnLogout.setBackground(new Color(200, 50, 50));
+		btnLogout.setBounds(4, 520, 169, 35);
+		panelLateral.add(btnLogout);
+	}
+	
+	public void showMainPanel() {
+		panelMain.setVisible(true);
 	}
 }
